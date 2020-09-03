@@ -30,8 +30,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-
+        Route::pattern('id', '[0-9]+'); // Validate ID Globally
         parent::boot();
     }
 

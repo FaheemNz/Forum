@@ -1,1 +1,14 @@
 1 - User <- Thread <- <- Reply
+
+Tests:
+    _____Feature______
+
+=> test_a_user_can_browse_threads
+=> test_a_user_can_view_a_single_thread
+=> test_a_user_can_read_replies_associated_with_thread
+
+    _____Unit______
+
+=> test_a_reply_has_an_owner
+=> test_a_thread_has_replies
+=> test_a_thread_has_an_owner

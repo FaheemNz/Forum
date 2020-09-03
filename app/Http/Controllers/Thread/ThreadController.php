@@ -1,20 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Thread;
 
-use App\Thread;
+use App\Http\Controllers\Controller;
+use App\Services\ThreadService;
 use Illuminate\Http\Request;
 
 class ThreadController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+{   
+    private ThreadService $threadService;
+
+    public function __construct(ThreadService $threadService)
+    {
+        $this->threadService = $threadService;
+    }
+
     public function index()
     {
-        //
+        $threads = $this->threadService->getThreads();
+        return view('threads.index', compact('threads'));
     }
 
     /**
@@ -33,20 +37,15 @@ class ThreadController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Thread $thread)
+    public function show(int $id)
     {
-        //
+        $thread = $this->threadService->getThread($id);
+        return view('threads.show', compact('thread'));
     }
 
     /**
@@ -55,7 +54,7 @@ class ThreadController extends Controller
      * @param  \App\Thread  $thread
      * @return \Illuminate\Http\Response
      */
-    public function edit(Thread $thread)
+    public function edit()
     {
         //
     }
@@ -67,7 +66,7 @@ class ThreadController extends Controller
      * @param  \App\Thread  $thread
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Thread $thread)
+    public function update(Request $request)
     {
         //
     }
@@ -78,7 +77,7 @@ class ThreadController extends Controller
      * @param  \App\Thread  $thread
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Thread $thread)
+    public function destroy()
     {
         //
     }
