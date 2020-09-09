@@ -1,25 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<a data-toggle="tooltip" data-placement="top" title="Create new Thread" href="{{ route('create_thread') }}" class="btn btn-floating is-fixed">+</a>
+
+<div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Threads') }}</div>
-
-                <div class="card-body">
-                    @foreach($threads as $thread)
-                        <article>
-                            <h4>
-                                <a href="{{ $thread->path() }}">{{ $thread->title }}</a>
-                            </h4>
-
-                            <div>{{ $thread->body }}</div>
-                        </article>
-                        <hr />
-                    @endforeach
-                </div>
-            </div>
+            <x-threads title="All Threads" :threads="$threads" />
         </div>
     </div>
 </div>

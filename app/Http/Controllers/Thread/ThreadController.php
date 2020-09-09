@@ -2,83 +2,65 @@
 
 namespace App\Http\Controllers\Thread;
 
+use App\Filters\ThreadFilters;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateThreadRequest;
 use App\Services\ThreadService;
-use Illuminate\Http\Request;
+use App\Thread;
 
 class ThreadController extends Controller
-{   
+{
     private ThreadService $threadService;
 
     public function __construct(ThreadService $threadService)
     {
         $this->threadService = $threadService;
+        $this->middleware('auth')->except(['index', 'show']);
     }
 
-    public function index()
+    public function index(\App\Channel $channel, ThreadFilters $threadFilters)
     {
-        $threads = $this->threadService->getThreads();
-        return view('threads.index', compact('threads'));
+        $threads = $this->threadService->getThreads($channel, $threadFilters);
+
+        return request()->expectsJson()
+            ? $threads
+            : view('threads.index', compact('threads'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        return view('threads.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store()
+    public function store(CreateThreadRequest $createThreadRequest)
     {
-        //
+        $threadCreated = $this->threadService->createThread($createThreadRequest->validated());
+
+        return $threadCreated
+            ? redirect($threadCreated->path())
+            : redirect()->back()->withErrors(__('messages.alerts.error'));
     }
 
-    public function show(int $id)
+    public function show($channelId, int $id)
     {
         $thread = $this->threadService->getThread($id);
         return view('threads.show', compact('thread'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
-    public function edit()
+    public function destroy($channel, Thread $thread)
     {
-        //
-    }
+        $this->authorize('delete', $thread);
+        
+        $isThreadDeleted = $this->threadService->deleteThread($thread);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request)
-    {
-        //
-    }
+        if (request()->wantsJson()) {
+            return $isThreadDeleted
+                ? response([], 204)
+                : response(['error' => 'Thread was not deleted. Some error occured.'], 401);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy()
-    {
-        //
+        return $isThreadDeleted
+            ? redirect('/threads')->with('success', 'Thread Deleted!')
+            : redirect()->back()->withErrors('Cant delete thread!');
     }
 }

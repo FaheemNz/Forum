@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Nunito);@charset "UTF-8";
+@charset "UTF-8";
 
 /*!
  * Bootstrap v4.5.2 (https://getbootstrap.com/)
@@ -10902,5 +10902,104 @@ a.text-dark:focus {
     color: inherit;
     border-color: #dee2e6;
   }
+}
+
+.table > thead {
+  background-color: #eee;
+}
+
+.thread-title {
+  color: #222;
+}
+
+.z-9999 {
+  z-index: 9999;
+}
+
+.btn {
+  border-radius: 4px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+}
+
+.custom-menu {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 6px;
+}
+
+.custom-menu a:hover {
+  border-left: 1px solid #38c172;
+}
+
+.btn-rounded {
+  border-radius: 36px;
+}
+
+.btn.btn-floating {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: #4582f6;
+  color: #fff;
+  font-size: 20px;
+  line-height: 44px;
+  transition: box-shadow 0.3s ease;
+}
+
+.btn.btn-floating:active {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-floating.is-fixed {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+}
+
+.badge {
+  padding: 0.5rem;
+}
+
+.border-0 {
+  border: none;
+}
+
+.is-link {
+  color: #222;
+}
+
+.is-link:hover {
+  text-decoration: none;
+}
+
+.timeline-item {
+  padding: 12px 24px 20px 24px;
+  position: relative;
+  border-left: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.timeline-meta {
+  margin-bottom: 0.5rem;
+}
+
+.timeline-item-body {
+  background-color: #fff;
+  padding: 0.75rem;
+  border-radius: 10px;
+}
+
+.timeline-item::after {
+  width: 10px;
+  height: 10px;
+  display: block;
+  top: 1em;
+  position: absolute;
+  left: -6px;
+  border-radius: 10px;
+  content: "";
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background: white;
 }
 

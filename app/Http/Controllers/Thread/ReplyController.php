@@ -15,15 +15,16 @@ class ReplyController extends Controller
         $this->replyService = $replyService;
     }
 
-    /**
-     * @param $id $threadId
-     */
-    public function store(ReplyRequest $replyRequest, int $id)
+    public function store(ReplyRequest $replyRequest, $channelId, int $threadId)
     {
-        if($this->replyService->addReplyToThread($replyRequest->validated(), $id)){
-            return redirect()->back()->with('success', __('messages.alert.success'));
-        }
+        $replyAddedToThread = $this->replyService->addReplyToThread(
+            $replyRequest->validated(),
+            $channelId,
+            $threadId
+        );
 
-        return redirect()->back()->with('error', __('messages.alert.error'));
+        return $replyAddedToThread
+            ? redirect()->back()->with('success', 'Reply added to the Thread')
+            : redirect()->back()->withErrors(__('messages.alerts.error'));
     }
 }

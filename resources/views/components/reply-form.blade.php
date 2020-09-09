@@ -1,14 +1,4 @@
-@if($errors->any())
-    @foreach($errors->all() as $error)
-        <div class="alert alert-danger">{{ $error }}</div>
-    @endforeach
-@enderror
-
-@if(Session::has('success'))
-    <div class="alert alert-success">{{ Session::get('success') }}</div>
-@endif
-
-<form action="{{ route('add_reply_to_thread', $thread->id) }}" method="POST">
+<form action="{{ route('add_reply_to_thread', [$thread->channel->slug, $thread->id]) }}" method="POST">
     <h5>@lang('messages.words.reply')</h5>
     @csrf
     <div class="form-group">

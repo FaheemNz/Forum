@@ -7,7 +7,7 @@ use Illuminate\View\Component;
 class ReplyForm extends Component
 {
     public $thread;
-
+    
     public function __construct($thread)
     {
         $this->thread = $thread;
