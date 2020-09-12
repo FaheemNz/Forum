@@ -1,13 +1,13 @@
 @component('profile.activities.activity')
 @slot('heading')
 <span>{{ $activity->created_at }}</span>
-<span>{{ $profileUser->name }} published a <a href="" class="is-link">new thread</a></span>
+<span><i class="fa fa-github text-primary mr-2"></i> <a href="{{ route('profile', $profileUser->name) }}">{{ $profileUser->name }}</a> published a new thread</span>
 @endslot
 
 @slot('body')
-<h4>
-    <a href="{{ $activity->subject->path() }}" class="is-link">{{ $activity->subject->title }}</a>
-</h4>
-<div>{{ $activity->subject->body }}</div>
+<a href="{{ $activity->subject->path() }}" class="is-link">
+    <h4>{{ $activity->subject->title }}</h4>
+    <div>{{ $activity->subject->body }}</div>
+</a>
 @endslot
 @endcomponent

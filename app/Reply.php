@@ -9,16 +9,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reply extends Model
 {
-    use Favoritable, RecordsActivity;
+    use RecordsActivity, Favoritable;
 
     protected $guarded = [];
-
     protected $with = ['user:id,name', 'favorites:id,favoritable_id,user_id'];
-    
-    // Accessors
-    public function getCreatedAtAttribute(string $time): string
+    protected $appends = ['favoritesCount', 'isFavorited'];
+
+
+    public static function boot()
     {
-        return Carbon::parse($time)->diffForHumans();
+        parent::boot();
+        static::created(fn ($reply) => $reply->thread->increment('replies_count'));
+        static::deleted(fn ($reply) => $reply->thread->decrement('replies_count'));
+    }
+
+    public function path()
+    {
+        return $this->thread->path();
     }
 
     // Relationships
@@ -30,5 +37,11 @@ class Reply extends Model
     public function user()
     {
         return $this->belongsTo('App\User');
+    }
+
+    // Accessors
+    public function getCreatedAtAttribute(string $time): string
+    {
+        return Carbon::parse($time)->diffForHumans();
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\Events\OnThreadRecievesNewReply;
 use App\Filters\ThreadFilters;
+use App\Notifications\ThreadWasUpdated;
 use App\Traits\RecordsActivity;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -16,14 +18,44 @@ class Thread extends Model
 
     protected $with = ['user:id,name', 'channel:id,name,slug'];
 
+    protected static $defaultCols = ['id', 'title', 'body', 'user_id', 'channel_id', 'created_at', 'replies_count'];
+
     // Boot the Model
     public static function boot()
     {
         parent::boot();
-        
-        static::addGlobalScope('replyCount', fn ($builder) => $builder->withCount('replies'));
-
+        // Removed global scope of repliesCount
         static::deleting(fn ($thread) => $thread->replies->each->delete());
+    }
+
+    // Business Logic
+    public function subscribe($userId = null)
+    {
+        $this->subscriptions()->create([
+            'user_id' => $userId ?? auth()->id()
+        ]);
+
+        return $this;
+    }
+
+    public function unSubscribe($userId = null)
+    {
+        return $this->subscriptions()
+            ->where('user_id', $userId ?: auth()->id())
+            ->delete();
+    }
+
+    public function addReply($reply)
+    {
+        $reply = $this->replies()->create($reply);
+
+        $this->subscriptions
+            ->filter(fn ($subscription) => $subscription->user_id != $reply->user_id)
+            ->each(fn ($subscription) => $subscription->user->notify(new ThreadWasUpdated($this, $reply)));
+
+        event(new OnThreadRecievesNewReply());
+
+        return $reply;
     }
 
     // Helpers
@@ -32,7 +64,11 @@ class Thread extends Model
         return "/threads/{$this->channel->slug}/{$this->id}";
     }
 
-    // Relationships
+    /**
+     * 
+     * Relationships
+     * 
+     */
     public function replies()
     {
         return $this->hasMany('App\Reply')
@@ -50,20 +86,39 @@ class Thread extends Model
         return $this->belongsTo('App\Channel');
     }
 
-    // Query Scopes
+    public function subscriptions()
+    {
+        return $this->hasMany('App\ThreadSubscription');
+    }
+
+    /**
+     * 
+     * Query Scopes
+     * 
+     */
     public function scopeFilter($query, ThreadFilters $filters)
     {
         return $filters->apply($query);
     }
 
-    public function scopeCustomSelect($query)
+    public function scopeCustomSelect($query, $customCols = null)
     {
-        return $query->select(['id', 'title', 'body', 'user_id', 'channel_id', 'created_at']);
+        return $query->select($customCols ?? static::$defaultCols);
     }
 
-    // Accessors
-    public function getCreatedAtAttribute(string $time)
+    /**
+     * 
+     * Accessors
+     * 
+     */
+    public function getCreatedAtAttribute(string $time): string
     {
         return Carbon::parse($time)->diffForHumans();
+    }
+
+    public function getIsSubscribedToAttribute(): bool
+    {
+        return $this->subscriptions()->where('user_id', auth()->id())
+            ->exists();
     }
 }

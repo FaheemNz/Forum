@@ -8,8 +8,11 @@ class ThreadService
 {
     public function getThreads($channel, $filters)
     {
-        $threads = Thread::latest()->filter($filters);
+        $threads = Thread::customSelect(['id', 'user_id', 'title', 'created_at', 'channel_id', 'replies_count'])
+            ->latest()
+            ->filter($filters);
 
+        // If filtering thread by channels
         if ($channel->exists) {
             $threads->where('channel_id', $channel->id);
         }
@@ -19,7 +22,7 @@ class ThreadService
 
     public function getThread(int $id): Thread
     {
-        return Thread::customSelect()->findOrFail($id);
+        return Thread::customSelect()->findOrFail($id)->append('isSubscribedTo');
     }
 
     public function createThread($createThreadRequest): Thread

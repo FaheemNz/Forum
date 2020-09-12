@@ -66,7 +66,7 @@
                     @forelse($activities as $activity)
                     @include("profile.activities.{$activity->type}")
                     @empty
-                    <p>No activities...</p>
+                    <h4 class="text-center mt-4"><i class="fa fa-eye-slash mr-2"></i> No Activities yet...</h4>
                     @endforelse
                 </div>
             </div>

@@ -7,6 +7,7 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <td>User</td>
                         <td>Topic</td>
                         <td>Channel</td>
                         <td>Replies</td>
@@ -17,11 +18,15 @@
                     @forelse($threads as $thread)
                     <tr>
                         <td>
+                            <a href="{{ route('profile', $thread->user->name) }}" class="is-link">{{ $thread->user->name }}</a>
+                        </td>
+                        <td>
                             <a class="thread-title" href="{{ $thread->path() }}">{{ $thread->title }}</a>
                         </td>
                         <td>
                             <a class="badge badge-primary" href="{{ route('thread_channel', $thread->channel->slug) }}">
                                 {{ $thread->channel->name }}
+                                {{ $thread->channel->id }}
                             </a>
                         </td>
                         <td>{{ $thread->replies_count }}</td>

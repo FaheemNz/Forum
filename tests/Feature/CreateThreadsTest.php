@@ -23,6 +23,9 @@ class CreateThreadsTest extends TestCase
             ->assertSee($thread->body);
     }
 
+    /**
+     * @group Thread
+     */
     public function test_guess_may_not_create_threads()
     {
         $this->withExceptionHandling();
@@ -30,24 +33,26 @@ class CreateThreadsTest extends TestCase
         $this->post('/threads', [])->assertRedirect('/login');
     }
 
+    /**
+     * @group Thread
+     */
     public function test_an_authenticated_user_can_delete_his_threads()
     {
         $this->signIn();
 
-        $user = factory('App\User')->create();
+        factory('App\User')->create();
 
         $threadByMe = factory('App\Thread')->create(['user_id' => auth()->id()]);
-        $threadNotByMe = factory('App\Thread')->create(['user_id' => $user->id]);
         
-        $reply = factory('App\Reply')->create(['thread_id' => $threadByMe->id]);
+        $reply = factory('App\Reply')->create(['thread_id' => $threadByMe->id, 'user_id' => auth()->id()]);
 
         $this->delete($threadByMe->path());
-        $this->delete($threadNotByMe->path());
+        
+        $response = $this->delete("/replies/{$reply->id}");
 
         $this->assertDatabaseMissing('threads', ['id' => $threadByMe->id]);
         $this->assertDatabaseMissing('replies', ['id' => $reply->id]);
-        $this->assertDatabaseHas('threads', ['id' => $threadNotByMe->id]);
-
+        
         // Delete activities as well on thread deletion
         $this->assertDatabaseMissing('activities', [
             'subject_id' => $threadByMe->id,
@@ -59,6 +64,9 @@ class CreateThreadsTest extends TestCase
         ]);
     }
 
+    /**
+     * @group Thread
+     */
     public function test_guest_can_not_delete_thread()
     {
         $thread = factory('App\Thread')->create();

@@ -10,6 +10,8 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
 </head>
@@ -40,6 +42,7 @@
                                 </a>
                                 @endauth
                                 <a href="/threads?popular=1" class="dropdown-item">Popular</a>
+                                <a href="/threads?unanswered=1" class="dropdown-item">Unanswered Threads</a>
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -71,7 +74,7 @@
                         @else
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }}
+                                {{ auth()->user()->name }}
                             </a>
 
                             <div class="dropdown-menu custom-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -94,12 +97,23 @@
         </nav>
 
         <main class="py-4">
-            <x-global-alert />
             @yield('content')
         </main>
+
+        <transition name="fade">
+            <flash message="{{ session('flash') }}" />
+        </transition>
     </div>
 
     <!-- Scripts -->
+    @auth
+    <script>
+        window.App = {
+            signedIn: <?php echo auth()->check() ?>,
+            user: <?php echo json_encode(auth()->user()) ?>
+        };
+    </script>
+    @endauth
     <script src="{{ asset('js/app.js') }}" async defer></script>
 </body>
 

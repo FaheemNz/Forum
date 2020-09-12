@@ -22,7 +22,7 @@ class ProfileController extends Controller
     public function show(User $user)
     {
         $userActivities = $this->profileService->getUserActivities($user);
-
+       
         return view('profile.show', [
             'profileUser' => $user,
             'activities' => $userActivities

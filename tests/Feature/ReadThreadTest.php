@@ -28,15 +28,6 @@ class ReadThreadTest extends TestCase
         $response->assertSee($this->thread->title);
     }
 
-    public function test_a_user_can_read_replies_associated_with_thread()
-    {
-        $reply = factory('App\Reply')->create(['thread_id' => $this->thread->id]);
-
-        $response = $this->get($this->thread->path());
-
-        $response->assertStatus(200)->assertSee($reply->body);
-    }
-
     public function test_a_user_can_filter_threads_by_channel()
     {
         $channel = factory('App\Channel')->create(['name' => 'channel 1', 'slug' => 'channel 1']);
@@ -75,5 +66,27 @@ class ReadThreadTest extends TestCase
         $response = $this->getJson('threads?popular=1')->json();
 
         $this->assertEquals([3, 2, 0], array_column($response['data'], 'replies_count'));
+    }
+
+    public function test_a_user_can_request_all_replies_for_a_given_thread()
+    {
+        $thread = factory('App\Thread')->create();
+        $total = 2;
+
+        $reply = factory('App\Reply', $total)->create(['thread_id' => $thread]);
+
+        $response = $this->get($thread->path() .'/replies')->decodeResponseJson();
+
+        $this->assertEquals($total, $response['total']);
+    }
+
+    public function test_a_user_can_filter_threads_which_are_unanswered()
+    {
+        $thread = factory('App\Thread')->create();
+        factory('App\Reply')->create(['thread_id' => $thread->id]);
+
+        $response = $this->getJson('threads?unanswered=1')->json();
+
+        $this->assertCount(1, $response['data']);
     }
 }

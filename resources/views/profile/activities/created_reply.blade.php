@@ -1,7 +1,7 @@
 @component('profile.activities.activity')
 @slot('heading')
 <span>{{ $activity->created_at }}</span>
-<span>{{ $profileUser->name }} replied...</span>
+<span><i class="fa fa-comment text-success mr-2"></i> {{ $profileUser->name }} replied...</span>
 @endslot
 
 @slot('body')

@@ -37,7 +37,7 @@ class ThreadController extends Controller
         $threadCreated = $this->threadService->createThread($createThreadRequest->validated());
 
         return $threadCreated
-            ? redirect($threadCreated->path())
+            ? redirect($threadCreated->path())->with('flash', 'New Thread has been created')
             : redirect()->back()->withErrors(__('messages.alerts.error'));
     }
 
@@ -50,7 +50,7 @@ class ThreadController extends Controller
     public function destroy($channel, Thread $thread)
     {
         $this->authorize('delete', $thread);
-        
+
         $isThreadDeleted = $this->threadService->deleteThread($thread);
 
         if (request()->wantsJson()) {
@@ -60,7 +60,7 @@ class ThreadController extends Controller
         }
 
         return $isThreadDeleted
-            ? redirect('/threads')->with('success', 'Thread Deleted!')
-            : redirect()->back()->withErrors('Cant delete thread!');
+            ? redirect('/threads')->with('flash', 'Thread Deleted!')
+            : redirect()->back()->with('flash', 'Cant delete thread!');
     }
 }

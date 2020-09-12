@@ -17,18 +17,36 @@ Route::group(['name' => 'thread'], function () {
     Route::get('threads/create', 'Thread\ThreadController@create')->name('create_thread');
     Route::post('/threads', 'Thread\ThreadController@store')->name('store_thread');
     Route::delete('threads/{channel}/{thread}', 'Thread\ThreadController@destroy')->name('delete_thread');
-    
+
+    // Channel Routes
     Route::group(['name' => 'thread.channels'], function () {
         Route::get('threads/{channel}/{id}', 'Thread\ThreadController@show');
         Route::get('threads/{channel:slug}', 'Thread\ThreadController@index')->name('thread_channel');
     });
 
-    Route::group(['name' => 'thread.replies', 'middleware' => ['auth']], function () {
+    // Reply Routes
+    Route::group(['name' => 'thread.replies'], function () {
         Route::post('/threads/{channel}/{id}/replies', 'Thread\ReplyController@store')->name('add_reply_to_thread');
-        Route::post('/replies/{reply}/favorites', 'FavoriteController@store')->name('favorite_the_reply');
+        Route::delete('/replies/{reply}', 'Thread\ReplyController@destroy')->name('delete_reply');
+        Route::put('/replies/{reply}', 'Thread\ReplyController@update');
+        Route::get('/threads/{channel}/{thread}/replies', 'Thread\ReplyController@index');
     });
 
-    Route::group(['name' => 'thread.userProfile', 'middleware' => ['auth']], function () {
+    Route::group(['name' => 'api.thread.replies', 'middleware' => ['auth']], function () {
+        Route::post('/replies/{reply}/favorites', 'FavoriteController@store')->name('favorite_the_reply');
+        Route::delete('/replies/{reply}/favorites', 'FavoriteController@destroy')->name('delete_favorite');
+    });
+
+    // Profile Routes
+    Route::group(['name' => 'thread.userProfile'], function () {
         Route::get('profiles/{user:name}', 'ProfileController@show')->name('profile');
+        Route::get('/profiles/{user:name}/notifications', 'NotificationController@index');
+        Route::delete('/profiles/{user:name}/notifications/{notification}', 'NotificationController@destroy');
+    });
+
+    // Thread Subscriptions
+    Route::group(['name' => 'thread.subscription'], function () {
+        Route::post('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@store');
+        Route::delete('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@destroy');
     });
 });

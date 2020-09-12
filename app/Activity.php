@@ -10,6 +10,7 @@ class Activity extends Model
     protected $guarded = [];
     protected $perPage = 25;
 
+    // Relationships
     public function subject()
     {
         return $this->morphTo();

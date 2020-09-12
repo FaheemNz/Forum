@@ -19,7 +19,16 @@ class FavoriteController extends Controller
         $replyFavorited = $this->favoriteService->favoriteTheReply($reply);
 
         return $replyFavorited
-            ? redirect()->back()->with('success', 'Reply Favorited!')
-            : null;
+            ? response()->json(['message' => 'Favorited!'], 201)
+            : response()->json(['error' => 'Cant favorite!', 400]);
+    }
+
+    public function destroy(Reply $reply)
+    {
+        $replyUnFavorited = $this->favoriteService->unFavoriteTheReply($reply);
+
+        return $replyUnFavorited
+            ? response()->json(['message' => 'UnFavorited!'], 201)
+            : response()->json(['error' => 'Cant Unfavorite!', 400]);
     }
 }
