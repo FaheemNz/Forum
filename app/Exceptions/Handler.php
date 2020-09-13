@@ -50,6 +50,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof SpamException) {
+            return $this->respondWithError($exception);
+        } else if ($exception instanceof \Exception) {
+            return $this->respondWithError($exception, 500);
+        }
+
         return parent::render($request, $exception);
+    }
+
+    public function respondWithError($exception, int $code = 422)
+    {
+        return response()->json([
+            'error' => [
+                'message' => $exception->getMessage(),
+                'code' => $code
+            ]
+        ], $code);
     }
 }

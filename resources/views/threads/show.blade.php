@@ -41,9 +41,11 @@
                             <a href="{{ route('profile', $thread->user->name) }}">{{ $thread->user->name }}</a>
                             and it has <span v-text="repliesCount"></span> replies.
                         </p>
+                        @auth
                         <p>
                             <subscribe-button :active="{{ json_encode($thread->isSubscribedTo) }}"></subscribe-button>
                         </p>
+                        @endauth
                     </div>
                 </div>
             </div>

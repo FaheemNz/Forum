@@ -49,10 +49,13 @@ export default {
       return !window.App ? false : window.App.signedIn;
     },
 
-    canUpdate(){
-      return true;
-      //return this.authorize((user) =>);
-    }
+    authUserID() {
+      return window.App && window.App.user.id;
+    },
+
+    canUpdate() {
+      return this.authorize(() => this.data.user_id == this.authUserID);
+    },
   },
 
   methods: {
@@ -63,8 +66,7 @@ export default {
         .put("/replies/" + this.data.id, {
           body: this.body,
         })
-        .then((response) => response.status === 204 && flash("Reply updated!"))
-        .catch((error) => flash("Some error occured while updating reply..."));
+        .then((response) => response.status === 204 && flash("Reply updated!"));
 
       this.editing = false;
     },
@@ -74,10 +76,7 @@ export default {
         .delete("/replies/" + this.data.id)
         .then((response) => {
           this.$emit("deletereply", this.id);
-        })
-        .catch((error) =>
-          flash("Some error occured while deleting the reply...")
-        );
+        });
     },
   },
 };

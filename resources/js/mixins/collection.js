@@ -8,13 +8,12 @@ export default {
     methods: {
         remove(index) {
             this.items.splice(index, 1);
-            this.$emit("added");
-            flash("Reply deleted!");
+            this.$emit("removed");
         },
 
         add(item) {
             this.items.push(item);
-            this.$emit("removed");
+            this.$emit("added");
         }
     }
 };

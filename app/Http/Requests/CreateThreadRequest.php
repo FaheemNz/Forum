@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateThreadRequest extends FormRequest
-{
+{   
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,9 +23,11 @@ class CreateThreadRequest extends FormRequest
      */
     public function rules()
     {
+        $this->redirect = '/threads/create';
+
         return [
-            'title' => 'required',
-            'body' => 'required',
+            'title' => 'required|string',
+            'body' => 'required|string',
             'channel_id' => 'required|exists:channels,id'
         ];
     }

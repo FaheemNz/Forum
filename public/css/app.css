@@ -10934,6 +10934,7 @@ a.text-dark:focus {
   padding: 0;
   border-radius: 50%;
   background-color: #4582f6;
+  z-index: 10;
   cursor: pointer;
   color: #fff;
   font-size: 16px;
@@ -11027,18 +11028,6 @@ a.text-dark:focus {
   position: fixed;
   right: 10px;
   top: 10px;
-  background-color: #777;
   border-radius: 36px;
-  color: #fff;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: background-color 0.5s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  background-color: green;
 }
 

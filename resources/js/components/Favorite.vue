@@ -35,7 +35,7 @@ export default {
             axios
                 .delete(`/replies/${this.reply.id}/favorites`)
                 .then(response =>
-                    this.updateFavoritesState(false, response.data.message)
+                    this.updateFavoritesState(false, "Reply has been unfavorited", "alert-info")
                 );
         },
 
@@ -43,14 +43,14 @@ export default {
             axios
                 .post(`/replies/${this.reply.id}/favorites`)
                 .then(response =>
-                    this.updateFavoritesState(true, response.data.message)
+                    this.updateFavoritesState(true, "Reply has been favorited", "alert-success")
                 );
         },
 
-        updateFavoritesState(state, message) {
+        updateFavoritesState(state, message, type) {
             this.active = state;
             state ? this.count++ : this.count--;
-            flash(message);
+            flash(message, type);
         }
     }
 };

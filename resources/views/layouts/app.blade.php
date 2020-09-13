@@ -101,9 +101,7 @@
             @yield('content')
         </main>
 
-        <transition name="fade">
-            <flash message="{{ session('flash') }}" />
-        </transition>
+        <flash message="{{ session('flash') }}" />
     </div>
 
     <!-- Scripts -->

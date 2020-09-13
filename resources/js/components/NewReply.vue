@@ -4,7 +4,7 @@
       <div class="form-group">
         <textarea
           placeholder="Leave a Reply"
-          v-model="body"
+          v-model.trim="body"
           name="body"
           class="form-control"
           rows="5"
@@ -36,15 +36,23 @@ export default {
 
   methods: {
     addReply() {
-      if (!this.body.trim()) return;
+      if (!this.body) {
+        flash("Invalid Reply!", "alert-danger");
+        return;
+      }
 
-      let endPoint = location.pathname + '/replies';
+      let endPoint = location.pathname + "/replies";
 
       axios.post(endPoint, { body: this.body }).then((response) => {
-        this.body = "";
-        flash("Reply added!");
-        this.$emit("onnewreplycreated", response.data);
+        if (!response) return;
+        this.onAddNewReply(response);
       });
+    },
+
+    onAddNewReply(response) {
+      this.body = "";
+      this.$emit("onnewreplycreated", response.data);
+      flash("New reply has been created", "alert-success");
     },
   },
 };

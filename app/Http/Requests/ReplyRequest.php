@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Inspections\Spam;
 
 class ReplyRequest extends FormRequest
 {
@@ -13,6 +14,7 @@ class ReplyRequest extends FormRequest
      */
     public function authorize()
     {
+        $this->detectSpam();
         return true;
     }
 
@@ -26,5 +28,11 @@ class ReplyRequest extends FormRequest
         return [
             'body' => 'required',
         ];
+    }
+
+    protected function detectSpam()
+    {
+        $spam = new Spam();
+        return $spam->detect(request('body'));
     }
 }

@@ -1966,20 +1966,20 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios["delete"]("/replies/".concat(this.reply.id, "/favorites")).then(function (response) {
-        return _this.updateFavoritesState(false, response.data.message);
+        return _this.updateFavoritesState(false, "Reply has been unfavorited", "alert-info");
       });
     },
     create: function create() {
       var _this2 = this;
 
       axios.post("/replies/".concat(this.reply.id, "/favorites")).then(function (response) {
-        return _this2.updateFavoritesState(true, response.data.message);
+        return _this2.updateFavoritesState(true, "Reply has been favorited", "alert-success");
       });
     },
-    updateFavoritesState: function updateFavoritesState(state, message) {
+    updateFavoritesState: function updateFavoritesState(state, message, type) {
       this.active = state;
       state ? this.count++ : this.count--;
-      flash(message);
+      flash(message, type);
     }
   }
 });
@@ -2003,13 +2003,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["message"],
+  props: ["message", "type"],
   data: function data() {
     return {
       show: false,
-      body: ""
+      body: "",
+      alertTypeClass: ""
     };
   },
   created: function created() {
@@ -2020,13 +2020,15 @@ __webpack_require__.r(__webpack_exports__);
     }
 
     window.events.$on("flash", function (message) {
-      return _this.flash(message);
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      return _this.flash(message, type);
     });
   },
   methods: {
-    flash: function flash(message) {
+    flash: function flash(message, type) {
       this.show = true;
       this.body = message;
+      this.alertTypeClass = type;
       this.hide();
     },
     hide: function hide() {
@@ -2088,16 +2090,24 @@ __webpack_require__.r(__webpack_exports__);
     addReply: function addReply() {
       var _this = this;
 
-      if (!this.body.trim()) return;
-      var endPoint = location.pathname + '/replies';
+      if (!this.body) {
+        flash("Invalid Reply!", "alert-danger");
+        return;
+      }
+
+      var endPoint = location.pathname + "/replies";
       axios.post(endPoint, {
         body: this.body
       }).then(function (response) {
-        _this.body = "";
-        flash("Reply added!");
+        if (!response) return;
 
-        _this.$emit("onnewreplycreated", response.data);
+        _this.onAddNewReply(response);
       });
+    },
+    onAddNewReply: function onAddNewReply(response) {
+      this.body = "";
+      this.$emit("onnewreplycreated", response.data);
+      flash("New reply has been created", "alert-success");
     }
   }
 });
@@ -2292,8 +2302,15 @@ __webpack_require__.r(__webpack_exports__);
     signedIn: function signedIn() {
       return !window.App ? false : window.App.signedIn;
     },
+    authUserID: function authUserID() {
+      return window.App && window.App.user.id;
+    },
     canUpdate: function canUpdate() {
-      return true; //return this.authorize((user) =>);
+      var _this = this;
+
+      return this.authorize(function () {
+        return _this.data.user_id == _this.authUserID;
+      });
     }
   },
   methods: {
@@ -2303,18 +2320,14 @@ __webpack_require__.r(__webpack_exports__);
         body: this.body
       }).then(function (response) {
         return response.status === 204 && flash("Reply updated!");
-      })["catch"](function (error) {
-        return flash("Some error occured while updating reply...");
       });
       this.editing = false;
     },
     deleteReply: function deleteReply() {
-      var _this = this;
+      var _this2 = this;
 
       axios["delete"]("/replies/" + this.data.id).then(function (response) {
-        _this.$emit("deletereply", _this.id);
-      })["catch"](function (error) {
-        return flash("Some error occured while deleting the reply...");
+        _this2.$emit("deletereply", _this2.id);
       });
     }
   }
@@ -2358,15 +2371,15 @@ __webpack_require__.r(__webpack_exports__);
           requestType = this.isActive ? "delete" : "post";
       axios[requestType](endPoint).then(function (response) {
         if (response.status === 201) {
-          _this.updateUI("Subscribed to the thread...");
+          _this.updateUI("Subscribed to the thread...", "alert-success");
         } else if (response.status === 202) {
-          _this.updateUI("UnSubscribed from the thread...");
+          _this.updateUI("UnSubscribed from the thread...", "alert-info");
         }
       });
     },
-    updateUI: function updateUI(message) {
+    updateUI: function updateUI(message, type) {
       this.isActive = !this.isActive;
-      flash(message);
+      flash(message, type);
     }
   }
 });
@@ -20923,14 +20936,10 @@ var render = function() {
         { name: "show", rawName: "v-show", value: _vm.show, expression: "show" }
       ],
       staticClass: "alert shadow",
+      class: _vm.alertTypeClass,
       attrs: { role: "alert" }
     },
-    [
-      _c("div", [
-        _c("strong", [_vm._v("Alert!")]),
-        _vm._v("\n    " + _vm._s(_vm.body) + "\n  ")
-      ])
-    ]
+    [_c("div", [_vm._v("\n    " + _vm._s(_vm.body) + "\n  ")])]
   )
 }
 var staticRenderFns = []
@@ -20963,9 +20972,10 @@ var render = function() {
               directives: [
                 {
                   name: "model",
-                  rawName: "v-model",
+                  rawName: "v-model.trim",
                   value: _vm.body,
-                  expression: "body"
+                  expression: "body",
+                  modifiers: { trim: true }
                 }
               ],
               staticClass: "form-control",
@@ -20976,7 +20986,10 @@ var render = function() {
                   if ($event.target.composing) {
                     return
                   }
-                  _vm.body = $event.target.value
+                  _vm.body = $event.target.value.trim()
+                },
+                blur: function($event) {
+                  return _vm.$forceUpdate()
                 }
               }
             })
@@ -33585,17 +33598,37 @@ try {
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 
 Vue.prototype.authorize = function (handler) {
-  var user = window.App.signedIn;
+  var user = window.App && window.App.signedIn;
   return user ? handler(user) : false;
 };
 
-window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.events = new Vue();
 
 window.flash = function (message) {
-  return window.events.$emit("flash", message);
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  return window.events.$emit("flash", message, type);
 };
+
+window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+window.axios.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  if (error.response.data.error.message) {
+    flash(error.response.data.error.message, "alert-danger");
+  } else if (error.response.data.error.errors) {
+    var allErrors = Object.values(error.response.data.error.errors);
+    allErrors.map(function (value) {
+      flash(value, "alert-danger");
+    });
+  } // } else if (error.response.data.message) {
+  //     console.log("Ok!");
+  //     flash(error.response.data.error.message);
+  // } else {
+  //     flash("Some error occured!");
+  // }
+
+});
 
 /***/ }),
 
@@ -34169,12 +34202,11 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     remove: function remove(index) {
       this.items.splice(index, 1);
-      this.$emit("added");
-      flash("Reply deleted!");
+      this.$emit("removed");
     },
     add: function add(item) {
       this.items.push(item);
-      this.$emit("removed");
+      this.$emit("added");
     }
   }
 });

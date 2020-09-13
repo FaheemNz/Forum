@@ -7,6 +7,7 @@ use App\Http\Requests\ReplyRequest;
 use App\Services\ReplyService;
 use App\Reply;
 use App\Thread;
+use App\Utilities\SpamFilter;
 
 class ReplyController extends Controller
 {

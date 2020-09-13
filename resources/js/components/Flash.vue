@@ -1,7 +1,6 @@
 <template>
-  <aside class="alert shadow" role="alert" v-show="show">
+  <aside class="alert shadow" :class="alertTypeClass" role="alert" v-show="show">
     <div>
-      <strong>Alert!</strong>
       {{ body }}
     </div>
   </aside>
@@ -9,11 +8,13 @@
 
 <script>
 export default {
-  props: ["message"],
+  props: ["message", "type"],
+
   data() {
     return {
       show: false,
       body: "",
+      alertTypeClass: ""
     };
   },
 
@@ -22,13 +23,16 @@ export default {
       this.flash();
     }
 
-    window.events.$on("flash", (message) => this.flash(message));
+    window.events.$on("flash", (message, type = null) =>
+      this.flash(message, type)
+    );
   },
 
   methods: {
-    flash(message) {
+    flash(message, type) {
       this.show = true;
       this.body = message;
+      this.alertTypeClass = type;
 
       this.hide();
     },

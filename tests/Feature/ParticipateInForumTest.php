@@ -69,4 +69,14 @@ class ParticipateInForumTest extends TestCase
         $this->put("/replies/{$reply->id}", ['body' => $updatedReply]);
         $this->assertDatabaseHas('replies', ['id' => $reply->id, 'body' => $updatedReply]);
     }
+
+    public function test_replies_that_contain_spam_are_not_published()
+    {
+        $this->withoutExceptionHandling();
+        $this->signIn();
+        $thread = factory('App\Thread')->create();
+        $reply = factory('App\Reply')->make(['body' => 'Some Spam Here']);
+        $this->expectException('App\Exceptions\SpamException');
+        $this->post("{$thread->path()}/replies", $reply->toArray());
+    }
 }

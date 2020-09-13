@@ -29,16 +29,16 @@ export default {
 
       axios[requestType](endPoint).then((response) => {
         if (response.status === 201) {
-          this.updateUI("Subscribed to the thread...");
+          this.updateUI("Subscribed to the thread...", "alert-success");
         } else if (response.status === 202) {
-          this.updateUI("UnSubscribed from the thread...");
+          this.updateUI("UnSubscribed from the thread...", "alert-info");
         }
       });
     },
 
-    updateUI(message) {
+    updateUI(message, type) {
       this.isActive = !this.isActive;
-      flash(message);
+      flash(message, type);
     },
   },
 };
