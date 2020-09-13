@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReplyRequest;
 use App\Services\ReplyService;
 use App\Reply;
+use App\Thread;
 
 class ReplyController extends Controller
 {
@@ -22,12 +23,12 @@ class ReplyController extends Controller
         return $this->replyService->getThreadReplies($thread);
     }
 
-    public function store(ReplyRequest $replyRequest, $channelId, int $threadId)
+    public function store(ReplyRequest $replyRequest, $channelId, Thread $thread)
     {
         $newReply = $this->replyService->addReplyToThread(
             $replyRequest->validated(),
             $channelId,
-            $threadId
+            $thread
         );
 
         return $newReply

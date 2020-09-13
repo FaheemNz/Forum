@@ -17,11 +17,19 @@ class NotificationsTest extends TestCase
     {
         $thread = factory('App\Thread')->create()->subscribe();
         $this->assertCount(0, auth()->user()->notifications);
+        
         $thread->addReply([
             'user_id' => auth()->id(),
             'body' => 'Hello World'
         ]);
-        $this->assertCount(0, auth()->user()->fresh()->notifications);
+
+        $this->assertCount(0, auth()->user()->notifications);
+
+        $thread->addReply([
+            'user_id' => factory('App\User')->create()->id,
+            'body' => 'Hello World'
+        ]);
+        $this->assertCount(1, auth()->user()->fresh()->notifications);
     }
 
     public function test_an_authenticated_user_can_mark_a_notification_as_read()

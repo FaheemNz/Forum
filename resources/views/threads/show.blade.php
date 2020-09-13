@@ -3,6 +3,9 @@
 @section('content')
 <thread-view :initial-replies-count="{{ $thread->replies_count }}" inline-template>
     <div class="container">
+        <button data-toggle="tooltip" title="Scroll to top" class="btn btn-floating is-fixed scroll-top">
+            <i class="fa fa-long-arrow-up"></i>
+        </button>
         <div class="row mt-4">
             <div class="col-md-8">
 
@@ -29,7 +32,7 @@
                 </div>
 
                 <h6>Replies</h6>
-                <replies @added="repliesCount--"  @removed="repliesCount++"></replies>
+                <replies @added="repliesCount--" @removed="repliesCount++"></replies>
             </div>
             <div class="col-md-4">
                 <div class="card">

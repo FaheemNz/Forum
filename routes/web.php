@@ -26,7 +26,7 @@ Route::group(['name' => 'thread'], function () {
 
     // Reply Routes
     Route::group(['name' => 'thread.replies'], function () {
-        Route::post('/threads/{channel}/{id}/replies', 'Thread\ReplyController@store')->name('add_reply_to_thread');
+        Route::post('/threads/{channel}/{thread}/replies', 'Thread\ReplyController@store')->name('add_reply_to_thread');
         Route::delete('/replies/{reply}', 'Thread\ReplyController@destroy')->name('delete_reply');
         Route::put('/replies/{reply}', 'Thread\ReplyController@update');
         Route::get('/threads/{channel}/{thread}/replies', 'Thread\ReplyController@index');

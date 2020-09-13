@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Notifications\ThreadWasUpdated;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class ThreadTest extends TestCase
@@ -27,12 +29,20 @@ class ThreadTest extends TestCase
     public function test_a_thread_can_add_a_reply()
     {
         $this->signIn();
-
         $this->post($this->thread->path() . '/replies', [
             'body' => 'Hello World this is a reply!'
         ]);
-
         $this->assertCount(1, $this->thread->replies);
+    }
+
+    public function test_a_thread_notifies_all_registered_subscribers_when_a_reply_is_added()
+    {
+        Notification::fake();
+        $this->signIn()->thread->subscribe()->addReply([
+            'body' => 'Hello',
+            'user_id' => 1
+        ]);
+        Notification::assertSentTo(auth()->user(), ThreadWasUpdated::class);
     }
 
     public function test_a_thread_belongs_to_a_channel()
@@ -44,7 +54,6 @@ class ThreadTest extends TestCase
     public function test_a_thread_can_make_a_string_path()
     {
         $thread = factory('App\Thread')->create();
-
         $this->assertEquals(
             "/threads/{$thread->channel->slug}/{$thread->id}",
             $thread->path()
@@ -54,11 +63,8 @@ class ThreadTest extends TestCase
     public function test_a_thread_can_be_subscribed_to()
     {
         $this->signIn();
-
         $thread = factory('App\Thread')->create();
-
         $thread->subscribe(auth()->id());
-
         $this->assertEquals(
             1,
             $thread->subscriptions()
@@ -82,7 +88,6 @@ class ThreadTest extends TestCase
     {
         $thread = factory('App\Thread')->create();
         $this->signIn();
-        
         $this->assertFalse($thread->isSubscribedTo);
         $thread->subscribe();
         $this->assertTrue($thread->isSubscribedTo);

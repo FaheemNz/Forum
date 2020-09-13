@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-
 class NotificationController extends Controller
 {
     public function __construct()
@@ -18,6 +16,7 @@ class NotificationController extends Controller
 
     public function destroy($user, $notificationId)
     {
-        auth()->user()->unreadNotifications()->findOrFail($notificationId)->markAsRead();
+        auth()->user()->unreadNotifications()->findOrFail($notificationId)->delete();
+        return response()->json([], 204);
     }
 }

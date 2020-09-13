@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Notifications\ThreadWasUpdated;
+use App\Events\OnThreadRecievesNewReply;
 use App\Reply;
 use App\Thread;
 
@@ -18,16 +18,16 @@ class ReplyService
      * 
      * @param ReplyRequest $replyRequest
      * @param Channel $channelId
-     * @param Integer $threadId
+     * @param Thread $thread
      */
-    public function addReplyToThread($replyRequest, $channelId, int $threadId): Reply
+    public function addReplyToThread($replyRequest, $channelId, $thread): Reply
     {
-        $reply = Thread::findOrFail($threadId)
-            ->replies()
-            ->create([
-                'body' => $replyRequest['body'],
-                'user_id' => auth()->user()->id,
-            ]);
+        $reply = $thread->replies()->create([
+            'body' => $replyRequest['body'],
+            'user_id' => auth()->user()->id
+        ]);
+
+        event(new OnThreadRecievesNewReply($reply));
 
         return $reply->load('user:id,name');
     }

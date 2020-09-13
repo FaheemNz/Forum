@@ -48,13 +48,7 @@ class Thread extends Model
     public function addReply($reply)
     {
         $reply = $this->replies()->create($reply);
-
-        $this->subscriptions
-            ->filter(fn ($subscription) => $subscription->user_id != $reply->user_id)
-            ->each(fn ($subscription) => $subscription->user->notify(new ThreadWasUpdated($this, $reply)));
-
-        event(new OnThreadRecievesNewReply());
-
+        event(new OnThreadRecievesNewReply($reply));
         return $reply;
     }
 

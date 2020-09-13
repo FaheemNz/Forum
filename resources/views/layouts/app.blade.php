@@ -72,12 +72,13 @@
                         </li>
                         @endif
                         @else
+                        <user-notifications></user-notifications>
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                 {{ auth()->user()->name }}
                             </a>
 
-                            <div class="dropdown-menu custom-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a href="{{ route('profile', Auth::user()) }}" class="dropdown-item">Profile</a>
 
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
