@@ -4,9 +4,7 @@ namespace App;
 
 use App\Events\OnThreadRecievesNewReply;
 use App\Filters\ThreadFilters;
-use App\Notifications\ThreadWasUpdated;
 use App\Traits\RecordsActivity;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Thread extends Model
@@ -18,8 +16,8 @@ class Thread extends Model
 
     protected $with = ['user:id,name,avatar_path', 'channel:id,name,slug'];
 
-    protected static $defaultCols = ['id', 'title', 'body', 'user_id', 'channel_id', 'created_at', 'replies_count'];
-
+    protected static $defaultCols = ['id', 'title', 'body', 'user_id', 'channel_id', 'created_at', 'slug', 'replies_count'];
+    
     // Boot the Model
     public static function boot()
     {
@@ -45,6 +43,12 @@ class Thread extends Model
             ->delete();
     }
 
+    public function setBestReply($replyId)
+    {
+        $this->update(['best_reply_id' => $replyId]);
+    }
+
+    // For Testing
     public function addReply($reply)
     {
         $reply = $this->replies()->create($reply);
@@ -55,7 +59,7 @@ class Thread extends Model
     // Helpers
     public function path(): string
     {
-        return "/threads/{$this->channel->slug}/{$this->id}";
+        return "/threads/{$this->channel->slug}/{$this->slug}";
     }
 
     /**
@@ -107,12 +111,33 @@ class Thread extends Model
      */
     public function getCreatedAtAttribute(string $time): string
     {
-        return Carbon::parse($time)->diffForHumans();
+        return \Carbon\Carbon::parse($time)->diffForHumans();
     }
 
     public function getIsSubscribedToAttribute(): bool
     {
-        return $this->subscriptions()->where('user_id', auth()->id())
+        return $this->subscriptions()
+            ->where('user_id', auth()->id())
             ->exists();
+    }
+
+    /**
+     * 
+     * Mutators
+     * 
+     */
+
+    public function setSlugAttribute(string $title)
+    {
+        $this->attributes['slug'] = \Illuminate\Support\Str::slug($title) . '-' . $this->user->id;
+    }
+    
+    /*
+    *   Core
+    * 
+    */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 }

@@ -23,7 +23,6 @@ class ReadThreadTest extends TestCase
     public function test_a_user_can_view_a_single_thread()
     {
         $response = $this->get($this->thread->path());
-
         $response->assertStatus(200);
         $response->assertSee($this->thread->title);
     }

@@ -20,10 +20,12 @@ $factory->define(User::class, function (Faker $faker) {
 });
 
 $factory->define(Thread::class, function (Faker $faker) {
+    $title = $faker->sentence;
     return [
         'user_id' => fn () => factory('App\User')->create()->id,
         'channel_id' => fn () => factory('App\Channel')->create()->id,
-        'title' => $faker->sentence,
+        'title' => $title,
+        'slug' => Str::slug($title),
         'body' => $faker->paragraph,
     ];
 });

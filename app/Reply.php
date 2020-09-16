@@ -13,7 +13,7 @@ class Reply extends Model
 
     protected $guarded = [];
     protected $with = ['user:id,name', 'favorites:id,favoritable_id,user_id'];
-    protected $appends = ['favoritesCount', 'isFavorited'];
+    protected $appends = ['isFavorited', 'favoritesCount', 'isBest'];
 
 
     public static function boot()
@@ -24,7 +24,6 @@ class Reply extends Model
     }
 
     // Logic
-
     public function path()
     {
         return $this->thread->path();
@@ -41,6 +40,11 @@ class Reply extends Model
         return $matches[1];
     }
 
+    public function isBest()
+    {
+        return $this->id == $this->thread->best_reply_id;
+    }
+
     // Relationships
     public function thread()
     {
@@ -53,15 +57,22 @@ class Reply extends Model
     }
 
     // Accessors
+    
     // public function getCreatedAtAttribute(string $time): string
     // {
     //     return Carbon::parse($time)->diffForHumans();
     // }
+    
+    public function getIsBestAttribute()
+    {
+        return $this->isBest();
+    }
 
     // Mutators
     public function setBodyAttribute($body)
     {
         $name = preg_replace('/@([\w]+)/', '<a href="/profiles/$1">$0</a>', $body);
-        $this->attributes['body'] =$name;
+        $this->attributes['body'] = $name;
     }
+    
 }

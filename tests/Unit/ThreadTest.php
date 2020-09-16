@@ -51,11 +51,11 @@ class ThreadTest extends TestCase
         $this->assertInstanceOf('App\Channel', $thread->channel);
     }
 
-    public function test_a_thread_can_make_a_string_path()
+    public function test_a_thread_can_a_path()
     {
         $thread = factory('App\Thread')->create();
         $this->assertEquals(
-            "/threads/{$thread->channel->slug}/{$thread->id}",
+            "/threads/{$thread->channel->slug}/{$thread->slug}",
             $thread->path()
         );
     }
@@ -91,5 +91,26 @@ class ThreadTest extends TestCase
         $this->assertFalse($thread->isSubscribedTo);
         $thread->subscribe();
         $this->assertTrue($thread->isSubscribedTo);
+    }
+
+    public function test_a_unique_slug_is_generated_if_two_users_create_a_thread_with_same_title()
+    {
+        $this->signIn();
+        $threadByUser1 = factory('App\Thread')->create(['user_id' => auth()->id()]);
+        $this->signIn();
+        $threadByUser2 = factory('App\Thread')->create(['user_id' => auth()->id()]);
+        $this->assertNotEquals($threadByUser1->slug, $threadByUser2->slug);
+    }
+
+    public function test_an_error_is_thrown_if_the_same_user_creates_two_threads_with_same_title()
+    {
+        $this->signIn();
+
+        $thread1 = factory('App\Thread')->raw(['title' => 'Hello World']);
+        $thread2 = factory('App\Thread')->raw(['title' => 'Hello World']);
+
+        $this->post('/threads', $thread1)->assertSessionHasNoErrors();
+        $this->post('/threads', $thread2);
+        $this->get('/threads/create')->assertSee('You already have a thread with the same title.');
     }
 }

@@ -8,7 +8,7 @@ class ThreadService
 {
     public function getThreads($channel, $filters)
     {
-        $threads = Thread::customSelect(['id', 'user_id', 'title', 'created_at', 'channel_id', 'replies_count'])
+        $threads = Thread::customSelect(['id', 'user_id', 'title', 'slug', 'created_at', 'channel_id', 'replies_count'])
             ->latest()
             ->filter($filters);
 
@@ -20,19 +20,21 @@ class ThreadService
         return $threads->paginate();
     }
 
-    public function getThread(int $id): Thread
+    public function getThread(Thread $thread): Thread
     {
-        return Thread::customSelect()->findOrFail($id)->append('isSubscribedTo');
+        return $thread->append('isSubscribedTo');
     }
 
     public function createThread($createThreadRequest): Thread
     {
+        $title = $createThreadRequest['title'];
         return Thread::create(
             [
                 'user_id' => auth()->user()->id,
-                'title' => $createThreadRequest['title'],
+                'title' => $title,
                 'body' => $createThreadRequest['body'],
-                'channel_id' => $createThreadRequest['channel_id']
+                'channel_id' => $createThreadRequest['channel_id'],
+                'slug' => $createThreadRequest['title']
             ]
         );
     }

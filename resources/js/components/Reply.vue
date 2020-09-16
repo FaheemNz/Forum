@@ -1,16 +1,19 @@
 <template>
-  <div class="card mb-4">
+  <div class="card mb-4" :class="isBestReply ? 'is-best' : ''">
+    <span v-if="isBestReply" class="badge badge-success best-reply-badge">Best Reply</span>
+
     <div class="card-header d-flex justify-content-between">
       <span>
-        <a :href="'/profiles/' + data.user.name">{{ data.user.name }}</a>
-        replied {{ data.created_at }}
+        <a class="link" :href="'/profiles/' + reply.user.name">{{ reply.user.name }}</a>
+        replied {{ reply.created_at }}
       </span>
-      <favorite v-if="signedIn" :reply="data"></favorite>
+      <favorite v-if="signedIn" :reply="reply"></favorite>
     </div>
+
     <div class="card-body">
       <div v-if="editing" class="form-group text-right">
         <form @submit.prevent="update">
-          <textarea name id class="form-control" required v-model.trim="body" rows="6"></textarea>
+          <textarea name="body" class="form-control" required v-model.trim="body" rows="6"></textarea>
           <div class="mt-3">
             <button type="button" class="btn" @click="editing = false">Cancel</button>
             <button type="submit" class="btn btn-primary">Update</button>
@@ -19,13 +22,40 @@
       </div>
       <div v-else v-html="body"></div>
     </div>
-    <div v-if="canUpdate" class="card-footer justify-content-end d-flex align-items-center">
-      <button @click="editing = !editing" type="button" class="btn is-sm btn-floating bg-info ml-1">
-        <i class="fa fa-pencil"></i>
-      </button>
-      <button type="button" @click="deleteReply" class="btn btn-floating is-sm bg-danger ml-1">
-        <i class="fa fa-trash"></i>
-      </button>
+
+    <div class="card-footer justify-content-between d-flex align-items-center">
+      <div v-if="authorize('updateReply', reply)">
+        <button
+          @click="editing = !editing"
+          type="button"
+          title="Edit Reply"
+          class="btn is-sm btn-floating bg-info ml-1"
+        >
+          <i class="fa fa-pencil"></i>
+        </button>
+        <button
+          data-toggle="tooltip"
+          title="Delete Reply"
+          type="button"
+          @click="deleteReply"
+          class="btn btn-floating is-sm bg-cyan ml-1"
+        >
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+
+      <div v-show="!isBestReply">
+        <button
+          data-toggle="tooltip"
+          title="Mark Reply as Best"
+          @click="setReplyAsBest"
+          type="button"
+          v-show="authorize('updateReply', reply)"
+          class="btn is-sm btn-floating bg-success ml-1"
+        >
+          <i class="fa fa-check"></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -36,24 +66,27 @@ import Favorite from "./Favorite.vue";
 export default {
   components: { Favorite },
 
-  props: ["data"],
+  props: ["reply"],
 
   data() {
     return {
       editing: false,
-      id: this.data.id,
-      body: this.data.body,
+      id: this.reply.id,
+      body: this.reply.body,
+      isBestReply: this.reply.isBest,
     };
   },
 
   computed: {
-    signedIn() {
-      return !window.App ? false : window.App.signedIn;
+    canSetBestReply() {
+      return true;
     },
+  },
 
-    canUpdate() {
-      return this.authorize((user) => user.id == this.data.user_id);
-    },
+  created() {
+    window.events.$on("onbestreplyselected", (bestReplyId) => {
+      this.isBestReply = bestReplyId === this.id;
+    });
   },
 
   methods: {
@@ -61,23 +94,28 @@ export default {
       if (!this.body) return;
 
       axios
-        .put("/replies/" + this.data.id, {
+        .put(`/replies/${this.reply.id}`, {
           body: this.body,
         })
-        .then(
-          (response) =>
-            response.status === 204 &&
-            this.updateUI("Reply has been updated!", "alert-info")
-        );
+        .then(function (response) {
+          response.status === 204 &&
+            this.updateUI("Reply has been updated!", "alert-info");
+        });
 
       this.editing = false;
     },
 
     deleteReply() {
-      axios.delete("/replies/" + this.data.id).then((response) => {
-        if (response.status === 204) {
+      axios.delete(`/replies/${this.reply.id}`).then((response) => {
+        response.status === 204 &&
           this.updateUI("Reply has been deleted", "alert-info");
-        }
+      });
+    },
+
+    setReplyAsBest() {
+      axios.post(`/replies/${this.id}/best`).then((response) => {
+        response.status === 204 &&
+          window.events.$emit("onbestreplyselected", this.id);
       });
     },
 

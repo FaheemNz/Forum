@@ -33,34 +33,28 @@ class ThreadController extends Controller
 
     public function store(CreateThreadRequest $createThreadRequest)
     {
-        $threadCreated = $this->threadService->createThread($createThreadRequest->validated());
-
-        return $threadCreated
-            ? redirect($threadCreated->path())->with('flash', 'New Thread has been created')
-            : redirect()->back()->withErrors(__('messages.alerts.error'));
+        try {
+            $newThread = $this->threadService->createThread($createThreadRequest->validated());
+            return redirect($newThread->path())->with('flash', 'New thread has been created.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->back()->withErrors('You already have a thread with the same title.');
+        }
     }
 
-    public function show($channelId, int $id, RedisTrending $redisTrending)
+    public function show($channelId, \App\Thread $thread, RedisTrending $redisTrending)
     {
-        $thread = $this->threadService->getThread($id);
+        $thread = $this->threadService->getThread($thread);
         $redisTrending->push($thread);
         return view('threads.show', compact('thread'));
     }
 
-    public function destroy($channel, \App\Thread $thread)
+    public function destroy($channel, \App\Thread $thread, RedisTrending $redisTrending)
     {
         $this->authorize('delete', $thread);
 
-        $threadDeleted = $this->threadService->deleteThread($thread);
+        $redisTrending->remove($thread);
+        $this->threadService->deleteThread($thread);
 
-        // if (request()->wantsJson()) {
-        //     return $threadDeleted
-        //         ? response([], 204)
-        //         : response(['error' => 'Thread was not deleted. Some error occured.'], 401);
-        // }
-
-        return $threadDeleted
-            ? redirect('/threads')->with('flash', 'Thread Deleted!')
-            : redirect()->back()->with('flash', 'Cant delete thread!');
+        return redirect('/threads')->with('flash', 'Thread Deleted!');
     }
 }

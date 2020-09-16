@@ -11,41 +11,28 @@ try {
     require("bootstrap");
 } catch (e) {}
 
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
 window.Vue = require("vue");
 
-Vue.prototype.authorize = function(handler) {
-    let user = window.App && window.App.user;
-    return user ? handler(user) : false;
+import authorizations from "./authorizations.js";
+import axios from "./bootAxios.js";
+import { getLoggedInUser } from "./utils/getLoggedInUser.js";
+
+window.axios = axios;
+
+Vue.prototype.authorize = function(...params) {
+    let user = getLoggedInUser();
+
+    if (!user) return;
+
+    if (typeof params[0] === "string") {
+        return authorizations[params[0]](params[1]);
+    }
+
+    return params[0](user);
 };
+
+Vue.prototype.signedIn = !!getLoggedInUser();
 
 window.events = new Vue();
 window.flash = (message, type = null) =>
     window.events.$emit("flash", message, type);
-
-window.axios = require("axios");
-window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-
-window.axios.interceptors.response.use(
-    response => response,
-    error => {
-        
-        
-        if (error.response.data.error) {
-            flash(error.response.data.error.message, "alert-danger");
-        } else if (error.response.data.errors) {
-            let errorMessages = "";
-            Object.values(error.response.data.errors).map(v => (errorMessages += v + "<br/>"));
-            flash(errorMessages, "alert-danger");
-        } else {
-            flash("Some unexpected error occured!", "alert-warning");
-        }
-
-        return Promise.reject(error);
-    }
-);

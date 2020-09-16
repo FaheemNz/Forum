@@ -11004,6 +11004,16 @@ a.text-dark:focus {
   height: 48px;
 }
 
+.is-best {
+  border: 2px solid green;
+}
+
+.best-reply-badge {
+  position: absolute;
+  right: -2px;
+  top: -29px;
+}
+
 .table > thead {
   background-color: #eee;
 }

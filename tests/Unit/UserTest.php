@@ -19,11 +19,22 @@ class UserTest extends TestCase
         $user = factory('App\User')->create();
         $this->assertEquals($user->avatar_path, asset('avatars/Default.png'));
     }
-    
+
     public function test_a_user_can_update_their_image()
     {
         $user = factory('App\User')->create();
         $user->avatar_path = 'avatars/me.jpg';
         $this->assertEquals($user->avatar_path, asset('avatars/me.jpg'));
+    }
+
+    public function test_a_user_must_have_a_unique_username()
+    {
+        $user = factory('App\User')->create();
+        try {
+            $user2 = factory('App\User')->create(['name' => $user->name]);
+        } catch (\Exception $e) {
+            $this->assertDatabaseHas('users', ['id' => $user->id]);
+            $this->assertDatabaseMissing('users', ['id' => 2]);
+        }
     }
 }

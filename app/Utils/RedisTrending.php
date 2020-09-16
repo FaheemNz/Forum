@@ -4,29 +4,48 @@ namespace App\Utils;
 
 use Illuminate\Support\Facades\Redis;
 
-class RedisTrending
+class  RedisTrending
 {
-    public function get()
+    protected const CACHE_KEY = 'trending_threads';
+
+    /**
+     * Get top 5 comments from Redis Set
+     * 
+     * @return array
+     */
+    public function get(): array
     {
-        return array_map('json_decode', Redis::zrevrange($this->cacheKey(), 0, 4));
+        return array_map('json_decode', Redis::zrevrange(self::CACHE_KEY, 0, 4));
     }
 
     /**
-     * updateTrendingThreads
+     * Update Trending Threads
      *
-     * @param  mixed $thread
+     * @param  Thread $thread
      * @return void
      */
-    public function push($thread)
+    public function push($thread): void
     {
-        Redis::zincrby($this->cacheKey(), 1, json_encode([
-            'title' => $thread->title,
-            'path' => $thread->path()
-        ]));
+        Redis::zincrby(self::CACHE_KEY, 1, $this->generateKey($thread));
+    }
+
+    /**
+     *  Remove a value from Redis Sorted Set
+     *
+     *  @param Thread $thread
+     */
+    public function remove($thread): void
+    {
+        Redis::zrem(self::CACHE_KEY, $this->generateKey($thread));
     }
     
-    public function cacheKey()
+    /**
+     * Encrypt and Decrypt key to be inserted and deleted in Redis set
+     * 
+     * @return string
+     */
+    protected function generateKey($thread): string
     {
-        return 'trending_threads';
+        return json_encode(['title' => $thread->title, 'path' => $thread->path()]);
     }
 }

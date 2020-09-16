@@ -16,11 +16,12 @@ class SubscribeToThreadTest extends TestCase
         $this->post($thread->path() . '/subscriptions');
         $this->assertCount(1, $thread->subscriptions);
     }
-    public function test_an_authenicated_user_can_unsubscribe_from_a_thread()
+    public function test_an_authenticated_user_can_unsubscribe_from_a_thread()
     {
+        $this->withoutExceptionHandling();
         $this->signIn();
         $thread = factory('App\Thread')->create();
-        $this->delete($thread->path() . '/subscriptions');
+        $response = $this->delete($thread->path() . '/subscriptions');
         $this->assertCount(0, $thread->subscriptions);
     }
 }

@@ -11,12 +11,14 @@ class CreateThreadsTest extends TestCase
      */
     public function test_an_authenticated_user_can_create_new_thread()
     {
-        $this->actingAs(factory('App\User')->create());
+        $this->withoutExceptionHandling();
+        
+        $this->signIn();
 
         $thread = factory('App\Thread')->make();
 
         $response = $this->post('/threads', $thread->toArray());
-
+        
         // if we just do $threads->path(), we don't get the primary key as we are calling make instead of create
         $this->get($response->headers->get('Location'))
             ->assertSee($thread->title)

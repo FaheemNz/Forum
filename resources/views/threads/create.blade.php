@@ -4,6 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            
             <div class="card shadow-sm">
                 <div class="card-header">{{ __('messages.words.newThread') }}</div>
 
@@ -36,9 +37,9 @@
                     </form>
 
                     @if($errors->any())
-                        @foreach($errors->all() as $error)
-                            <li class="text-danger">{{ $error }}</li>
-                        @endforeach
+                    @foreach($errors->all() as $error)
+                    <li class="text-danger">{{ $error }}</li>
+                    @endforeach
                     @endif
 
                 </div>

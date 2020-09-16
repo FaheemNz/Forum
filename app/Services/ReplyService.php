@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Events\OnThreadRecievesNewReply;
-use App\Notifications\UserWasMentioned;
 use App\Reply;
 
 class ReplyService
@@ -19,6 +18,8 @@ class ReplyService
      * @param ReplyRequest $replyRequest
      * @param Channel $channelId
      * @param Thread $thread
+     * 
+     * @return Reply
      */
     public function addReplyToThread($replyRequest, $channelId, \App\Thread $thread): Reply
     {

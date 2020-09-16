@@ -32,4 +32,12 @@ class ReplyTest extends TestCase
             $reply->body
         );
     }
+
+    public function test_it_knows_if_it_is_the_best_reply()
+    {
+        $this->withoutExceptionHandling();
+        $reply = factory('App\Reply')->create();
+        $reply->thread->update(['best_reply_id' => $reply->id]);
+        $this->assertTrue($reply->isBest());
+    }
 }

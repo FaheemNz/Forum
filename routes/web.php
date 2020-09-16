@@ -20,7 +20,7 @@ Route::group(['name' => 'thread'], function () {
 
     // Channel Routes
     Route::group(['name' => 'thread.channels'], function () {
-        Route::get('threads/{channel}/{id}', 'Thread\ThreadController@show');
+        Route::get('threads/{channel}/{thread}', 'Thread\ThreadController@show');
         Route::get('threads/{channel:slug}', 'Thread\ThreadController@index')->name('thread_channel');
     });
 
@@ -32,9 +32,15 @@ Route::group(['name' => 'thread'], function () {
         Route::get('/threads/{channel}/{thread}/replies', 'Thread\ReplyController@index');
     });
 
-    Route::group(['name' => 'api.thread.replies', 'middleware' => ['auth']], function () {
+    // Favorites
+    Route::group(['name' => 'reply.favorite', 'middleware' => ['auth']], function () {
         Route::post('/replies/{reply}/favorites', 'FavoriteController@store')->name('favorite_the_reply');
         Route::delete('/replies/{reply}/favorites', 'FavoriteController@destroy')->name('delete_favorite');
+    });
+
+    // Best Reply
+    Route::group(['name' => 'reply.best', 'middleware' => ['auth']], function () {
+        Route::post('/replies/{reply}/best', 'Thread\BestReplyController@store')->name('best-reply.store');
     });
 
     // Profile Routes
@@ -50,6 +56,7 @@ Route::group(['name' => 'thread'], function () {
         Route::delete('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@destroy');
     });
 
+    // Avatar
     Route::group(['name' => 'thread.api', 'middleware' => ['auth']], function () {
         Route::post('/api/users/{user}/avatar', 'Api\AvatarController@store')->name('store_avatar');
     });

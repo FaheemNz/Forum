@@ -2,9 +2,6 @@
   <div class="mt-4 mb-4">
     <form @submit.prevent="addReply" v-if="signedIn">
       <div class="form-group">
-        Please combine both first name and last name or put a hyphen between them.
-      </div>
-      <div class="form-group">
         <textarea
           placeholder="Leave a Reply"
           v-model.trim="body"
@@ -30,12 +27,6 @@ export default {
     return {
       body: "",
     };
-  },
-
-  computed: {
-    signedIn() {
-      return window.App && window.App.signedIn;
-    },
   },
 
   methods: {

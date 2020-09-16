@@ -2207,19 +2207,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       body: ""
     };
-  },
-  computed: {
-    signedIn: function signedIn() {
-      return window.App && window.App.signedIn;
-    }
   },
   methods: {
     addReply: function addReply() {
@@ -2422,50 +2414,84 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
     Favorite: _Favorite_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
-  props: ["data"],
+  props: ["reply"],
   data: function data() {
     return {
       editing: false,
-      id: this.data.id,
-      body: this.data.body
+      id: this.reply.id,
+      body: this.reply.body,
+      isBestReply: this.reply.isBest
     };
   },
   computed: {
-    signedIn: function signedIn() {
-      return !window.App ? false : window.App.signedIn;
-    },
-    canUpdate: function canUpdate() {
-      var _this = this;
-
-      return this.authorize(function (user) {
-        return user.id == _this.data.user_id;
-      });
+    canSetBestReply: function canSetBestReply() {
+      return true;
     }
+  },
+  created: function created() {
+    var _this = this;
+
+    window.events.$on("onbestreplyselected", function (bestReplyId) {
+      _this.isBestReply = bestReplyId === _this.id;
+    });
   },
   methods: {
     update: function update() {
-      var _this2 = this;
-
       if (!this.body) return;
-      axios.put("/replies/" + this.data.id, {
+      axios.put("/replies/".concat(this.reply.id), {
         body: this.body
       }).then(function (response) {
-        return response.status === 204 && _this2.updateUI("Reply has been updated!", "alert-info");
+        response.status === 204 && this.updateUI("Reply has been updated!", "alert-info");
       });
       this.editing = false;
     },
     deleteReply: function deleteReply() {
+      var _this2 = this;
+
+      axios["delete"]("/replies/".concat(this.reply.id)).then(function (response) {
+        response.status === 204 && _this2.updateUI("Reply has been deleted", "alert-info");
+      });
+    },
+    setReplyAsBest: function setReplyAsBest() {
       var _this3 = this;
 
-      axios["delete"]("/replies/" + this.data.id).then(function (response) {
-        if (response.status === 204) {
-          _this3.updateUI("Reply has been deleted", "alert-info");
-        }
+      axios.post("/replies/".concat(this.id, "/best")).then(function (response) {
+        response.status === 204 && window.events.$emit("onbestreplyselected", _this3.id);
       });
     },
     updateUI: function updateUI(message, type) {
@@ -21944,12 +21970,6 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "form-group" }, [
-              _vm._v(
-                "\n      Please combine both first name and last name or put a hyphen between them.\n    "
-              )
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
               _c("textarea", {
                 directives: [
                   {
@@ -22147,7 +22167,7 @@ var render = function() {
           { key: reply.id },
           [
             _c("reply", {
-              attrs: { data: reply },
+              attrs: { reply: reply },
               on: {
                 deletereply: function($event) {
                   return _vm.remove(index)
@@ -22191,128 +22211,188 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card mb-4" }, [
-    _c(
-      "div",
-      { staticClass: "card-header d-flex justify-content-between" },
-      [
-        _c("span", [
-          _c("a", { attrs: { href: "/profiles/" + _vm.data.user.name } }, [
-            _vm._v(_vm._s(_vm.data.user.name))
-          ]),
-          _vm._v("\n      replied " + _vm._s(_vm.data.created_at) + "\n    ")
-        ]),
-        _vm._v(" "),
-        _vm.signedIn ? _c("favorite", { attrs: { reply: _vm.data } }) : _vm._e()
-      ],
-      1
-    ),
-    _vm._v(" "),
-    _c("div", { staticClass: "card-body" }, [
-      _vm.editing
-        ? _c("div", { staticClass: "form-group text-right" }, [
+  return _c(
+    "div",
+    { staticClass: "card mb-4", class: _vm.isBestReply ? "is-best" : "" },
+    [
+      _vm.isBestReply
+        ? _c("span", { staticClass: "badge badge-success best-reply-badge" }, [
+            _vm._v("Best Reply")
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "card-header d-flex justify-content-between" },
+        [
+          _c("span", [
             _c(
-              "form",
+              "a",
               {
-                on: {
-                  submit: function($event) {
-                    $event.preventDefault()
-                    return _vm.update($event)
-                  }
-                }
+                staticClass: "link",
+                attrs: { href: "/profiles/" + _vm.reply.user.name }
               },
-              [
-                _c("textarea", {
+              [_vm._v(_vm._s(_vm.reply.user.name))]
+            ),
+            _vm._v("\n      replied " + _vm._s(_vm.reply.created_at) + "\n    ")
+          ]),
+          _vm._v(" "),
+          _vm.signedIn
+            ? _c("favorite", { attrs: { reply: _vm.reply } })
+            : _vm._e()
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-body" }, [
+        _vm.editing
+          ? _c("div", { staticClass: "form-group text-right" }, [
+              _c(
+                "form",
+                {
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.update($event)
+                    }
+                  }
+                },
+                [
+                  _c("textarea", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model.trim",
+                        value: _vm.body,
+                        expression: "body",
+                        modifiers: { trim: true }
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { name: "body", required: "", rows: "6" },
+                    domProps: { value: _vm.body },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.body = $event.target.value.trim()
+                      },
+                      blur: function($event) {
+                        return _vm.$forceUpdate()
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "mt-3" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            _vm.editing = false
+                          }
+                        }
+                      },
+                      [_vm._v("Cancel")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Update")]
+                    )
+                  ])
+                ]
+              )
+            ])
+          : _c("div", { domProps: { innerHTML: _vm._s(_vm.body) } })
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass:
+            "card-footer justify-content-between d-flex align-items-center"
+        },
+        [
+          _vm.authorize("updateReply", _vm.reply)
+            ? _c("div", [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn is-sm btn-floating bg-info ml-1",
+                    attrs: { type: "button", title: "Edit Reply" },
+                    on: {
+                      click: function($event) {
+                        _vm.editing = !_vm.editing
+                      }
+                    }
+                  },
+                  [_c("i", { staticClass: "fa fa-pencil" })]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-floating is-sm bg-cyan ml-1",
+                    attrs: {
+                      "data-toggle": "tooltip",
+                      title: "Delete Reply",
+                      type: "button"
+                    },
+                    on: { click: _vm.deleteReply }
+                  },
+                  [_c("i", { staticClass: "fa fa-trash" })]
+                )
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: !_vm.isBestReply,
+                  expression: "!isBestReply"
+                }
+              ]
+            },
+            [
+              _c(
+                "button",
+                {
                   directives: [
                     {
-                      name: "model",
-                      rawName: "v-model.trim",
-                      value: _vm.body,
-                      expression: "body",
-                      modifiers: { trim: true }
+                      name: "show",
+                      rawName: "v-show",
+                      value: _vm.authorize("updateReply", _vm.reply),
+                      expression: "authorize('updateReply', reply)"
                     }
                   ],
-                  staticClass: "form-control",
-                  attrs: { name: "", id: "", required: "", rows: "6" },
-                  domProps: { value: _vm.body },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.body = $event.target.value.trim()
-                    },
-                    blur: function($event) {
-                      return _vm.$forceUpdate()
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", { staticClass: "mt-3" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          _vm.editing = false
-                        }
-                      }
-                    },
-                    [_vm._v("Cancel")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: { type: "submit" }
-                    },
-                    [_vm._v("Update")]
-                  )
-                ])
-              ]
-            )
-          ])
-        : _c("div", { domProps: { innerHTML: _vm._s(_vm.body) } })
-    ]),
-    _vm._v(" "),
-    _vm.canUpdate
-      ? _c(
-          "div",
-          {
-            staticClass:
-              "card-footer justify-content-end d-flex align-items-center"
-          },
-          [
-            _c(
-              "button",
-              {
-                staticClass: "btn is-sm btn-floating bg-info ml-1",
-                attrs: { type: "button" },
-                on: {
-                  click: function($event) {
-                    _vm.editing = !_vm.editing
-                  }
-                }
-              },
-              [_c("i", { staticClass: "fa fa-pencil" })]
-            ),
-            _vm._v(" "),
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-floating is-sm bg-danger ml-1",
-                attrs: { type: "button" },
-                on: { click: _vm.deleteReply }
-              },
-              [_c("i", { staticClass: "fa fa-trash" })]
-            )
-          ]
-        )
-      : _vm._e()
-  ])
+                  staticClass: "btn is-sm btn-floating bg-success ml-1",
+                  attrs: {
+                    "data-toggle": "tooltip",
+                    title: "Mark Reply as Best",
+                    type: "button"
+                  },
+                  on: { click: _vm.setReplyAsBest }
+                },
+                [_c("i", { staticClass: "fa fa-check" })]
+              )
+            ]
+          )
+        ]
+      )
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -34578,48 +34658,40 @@ var app = new Vue({
 
 /***/ }),
 
-/***/ "./resources/js/bootstrap.js":
+/***/ "./resources/js/authorizations.js":
+/*!****************************************!*\
+  !*** ./resources/js/authorizations.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/getLoggedInUser.js */ "./resources/js/utils/getLoggedInUser.js");
+
+var user = Object(_utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_1__["getLoggedInUser"])();
+var authorizations = {
+  updateReply: function updateReply(reply) {
+    return reply.user_id === user.id;
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (authorizations);
+
+/***/ }),
+
+/***/ "./resources/js/bootAxios.js":
 /*!***********************************!*\
-  !*** ./resources/js/bootstrap.js ***!
+  !*** ./resources/js/bootAxios.js ***!
   \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
-try {
-  window.Popper = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js")["default"];
-  window.$ = window.jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 
-  __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
-} catch (e) {}
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
-
-window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-
-Vue.prototype.authorize = function (handler) {
-  var user = window.App && window.App.user;
-  return user ? handler(user) : false;
-};
-
-window.events = new Vue();
-
-window.flash = function (message) {
-  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  return window.events.$emit("flash", message, type);
-};
-
-window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-window.axios.interceptors.response.use(function (response) {
+axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+axios.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
   if (error.response.data.error) {
@@ -34636,6 +34708,62 @@ window.axios.interceptors.response.use(function (response) {
 
   return Promise.reject(error);
 });
+/* harmony default export */ __webpack_exports__["default"] = (axios);
+
+/***/ }),
+
+/***/ "./resources/js/bootstrap.js":
+/*!***********************************!*\
+  !*** ./resources/js/bootstrap.js ***!
+  \***********************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _authorizations_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./authorizations.js */ "./resources/js/authorizations.js");
+/* harmony import */ var _bootAxios_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bootAxios.js */ "./resources/js/bootAxios.js");
+/* harmony import */ var _utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/getLoggedInUser.js */ "./resources/js/utils/getLoggedInUser.js");
+/**
+ * We'll load jQuery and the Bootstrap jQuery plugin which provides support
+ * for JavaScript based Bootstrap features such as modals and tabs. This
+ * code may be modified to fit the specific needs of your application.
+ */
+try {
+  window.Popper = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js")["default"];
+  window.$ = window.jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+
+  __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.js");
+} catch (e) {}
+
+window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+
+
+
+window.axios = _bootAxios_js__WEBPACK_IMPORTED_MODULE_1__["default"];
+
+Vue.prototype.authorize = function () {
+  var user = Object(_utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_2__["getLoggedInUser"])();
+  if (!user) return;
+
+  for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
+    params[_key] = arguments[_key];
+  }
+
+  if (typeof params[0] === "string") {
+    return _authorizations_js__WEBPACK_IMPORTED_MODULE_0__["default"][params[0]](params[1]);
+  }
+
+  return params[0](user);
+};
+
+Vue.prototype.signedIn = !!Object(_utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_2__["getLoggedInUser"])();
+window.events = new Vue();
+
+window.flash = function (message) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  return window.events.$emit("flash", message, type);
+};
 
 /***/ }),
 
@@ -35405,6 +35533,22 @@ component.options.__file = "resources/js/pages/Thread.vue"
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Thread_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Thread.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/pages/Thread.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Thread_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/utils/getLoggedInUser.js":
+/*!***********************************************!*\
+  !*** ./resources/js/utils/getLoggedInUser.js ***!
+  \***********************************************/
+/*! exports provided: getLoggedInUser */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getLoggedInUser", function() { return getLoggedInUser; });
+function getLoggedInUser() {
+  return window.App && window.App.user;
+}
 
 /***/ }),
 
