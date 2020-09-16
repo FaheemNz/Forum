@@ -25,8 +25,8 @@ class ChannelServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('*', function ($view) {
-            $channels = Cache::rememberForever('gChannels', function(){
-                return \App\Channel::all();
+            $channels = Cache::rememberForever('gChannels', function () {
+                return \App\Channel::select(['id', 'name', 'slug'])->get();
             });
 
             $view->with('gChannels', $channels);

@@ -23,9 +23,22 @@ class Reply extends Model
         static::deleted(fn ($reply) => $reply->thread->decrement('replies_count'));
     }
 
+    // Logic
+
     public function path()
     {
         return $this->thread->path();
+    }
+
+    public function wasJustPublished()
+    {
+        return $this->created_at->gt(Carbon::now()->subMinute());
+    }
+
+    public function getMentionedUsersInReply($text)
+    {
+        preg_match_all('/@([\w]+)/', $text, $matches);
+        return $matches[1];
     }
 
     // Relationships
@@ -40,8 +53,15 @@ class Reply extends Model
     }
 
     // Accessors
-    public function getCreatedAtAttribute(string $time): string
+    // public function getCreatedAtAttribute(string $time): string
+    // {
+    //     return Carbon::parse($time)->diffForHumans();
+    // }
+
+    // Mutators
+    public function setBodyAttribute($body)
     {
-        return Carbon::parse($time)->diffForHumans();
+        $name = preg_replace('/@([\w]+)/', '<a href="/profiles/$1">$0</a>', $body);
+        $this->attributes['body'] =$name;
     }
 }

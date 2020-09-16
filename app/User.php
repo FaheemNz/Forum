@@ -10,7 +10,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'avatar_path'
     ];
 
     protected $hidden = [
@@ -21,6 +21,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // Accessors
+    public function getAvatarPathAttribute($value): string
+    {
+        return asset($value ?? 'avatars/Default.png');
+    }
+
     // Relationships
     public function threads()
     {
@@ -30,5 +36,10 @@ class User extends Authenticatable
     public function activity()
     {
         return $this->hasMany('App\Activity');
+    }
+
+    public function lastReply()
+    {
+        return $this->hasOne('App\Reply')->latest();
     }
 }

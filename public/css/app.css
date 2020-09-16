@@ -10929,8 +10929,8 @@ a.text-dark:focus {
 }
 
 .btn.btn-floating {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   border-radius: 50%;
   background-color: #4582f6;
@@ -10938,7 +10938,7 @@ a.text-dark:focus {
   cursor: pointer;
   color: #fff;
   font-size: 16px;
-  line-height: 44px;
+  line-height: 36px;
   transition: box-shadow 0.3s ease;
 }
 
@@ -10977,14 +10977,31 @@ a.text-dark:focus {
 
 .is-link {
   color: #222;
+  text-decoration: underline;
 }
 
+.link {
+  color: #222;
+}
+
+.link:hover,
 .is-link:hover {
-  text-decoration: none;
+  color: currentColor;
 }
 
 [v-cloak] {
   display: none;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+}
+
+.avatar-sm {
+  width: 48px;
+  height: 48px;
 }
 
 .table > thead {

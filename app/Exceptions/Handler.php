@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -50,10 +52,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($exception instanceof SpamException) {
+        if ($exception instanceof SpamException && $request->wantsJson()) {
             return $this->respondWithError($exception);
-        } else if ($exception instanceof \Exception) {
-            return $this->respondWithError($exception, 500);
+        } else if ($exception instanceof ValidationException && $request->expectsJson()) {
+            return $this->respondWithError($exception);
+        } else if ($exception instanceof ThrottleRequestsException) {
+            return $this->respondWithError($exception);
         }
 
         return parent::render($request, $exception);

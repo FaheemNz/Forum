@@ -16,7 +16,7 @@ class Thread extends Model
     protected $guarded = [];
     protected $perPage = 25;
 
-    protected $with = ['user:id,name', 'channel:id,name,slug'];
+    protected $with = ['user:id,name,avatar_path', 'channel:id,name,slug'];
 
     protected static $defaultCols = ['id', 'title', 'body', 'user_id', 'channel_id', 'created_at', 'replies_count'];
 

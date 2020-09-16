@@ -7,7 +7,6 @@ use App\Http\Requests\ReplyRequest;
 use App\Services\ReplyService;
 use App\Reply;
 use App\Thread;
-use App\Utilities\SpamFilter;
 
 class ReplyController extends Controller
 {
@@ -34,7 +33,7 @@ class ReplyController extends Controller
 
         return $newReply
             ? $newReply
-            : response()->json(['message' => 'Some error occured while adding reply'], 400);
+            : response()->json(['message' => 'Some error occured while adding reply'], 422);
     }
 
     public function destroy(Reply $reply)
@@ -44,7 +43,7 @@ class ReplyController extends Controller
         $replyDeleted = $this->replyService->deleteReplyFromThread($reply);
 
         return $replyDeleted
-            ? response()->json(['message' => 'Reply Deleted'], 201)
+            ? response()->json(['message' => 'Reply Deleted'], 204)
             : response()->json(['message', 'Cant delete reply'], 400);
     }
 

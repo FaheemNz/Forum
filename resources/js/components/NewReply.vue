@@ -1,19 +1,23 @@
 <template>
   <div class="mt-4 mb-4">
-    <div v-if="signedIn">
+    <form @submit.prevent="addReply" v-if="signedIn">
+      <div class="form-group">
+        Please combine both first name and last name or put a hyphen between them.
+      </div>
       <div class="form-group">
         <textarea
           placeholder="Leave a Reply"
           v-model.trim="body"
+          required
           name="body"
           class="form-control"
           rows="5"
         ></textarea>
       </div>
       <div class="form-group text-right">
-        <button type="submit" class="btn btn-primary" @click="addReply">Add Reply</button>
+        <button type="submit" class="btn btn-primary">Add Reply</button>
       </div>
-    </div>
+    </form>
     <p v-else class="text-center">
       <i class="fa fa-lock mr-2"></i> Sign in to take part in discussion...
     </p>

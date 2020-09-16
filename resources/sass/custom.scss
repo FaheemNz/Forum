@@ -23,8 +23,8 @@
 }
 
 .btn.btn-floating {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border-radius: 50%;
     background-color: #4582f6;
@@ -32,7 +32,7 @@
     cursor: pointer;
     color: #fff;
     font-size: 16px;
-    line-height: 44px;
+    line-height: 36px;
     transition: box-shadow 0.3s ease;
 
     &:active {
@@ -71,12 +71,28 @@
 
 .is-link {
     color: #222;
+    text-decoration: underline;
+}
 
-    &:hover {
-        text-decoration: none;
-    }
+.link {
+    color: #222
+}
+
+.link:hover, .is-link:hover {
+    color: currentColor
 }
 
 [v-cloak] {
     display: none;
+}
+
+.avatar {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px   
+}
+
+.avatar-sm {
+    width: 48px;
+    height: 48px;
 }

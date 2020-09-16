@@ -11,7 +11,7 @@ class Spam
 
     public function detect(string $body)
     {
-        foreach($this->inspections as $inspection){
+        foreach ($this->inspections as $inspection) {
             app($inspection)->detect($body);
         }
 

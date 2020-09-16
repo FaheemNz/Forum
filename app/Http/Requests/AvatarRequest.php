@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\SpamRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
-class CreateThreadRequest extends FormRequest
+class AvatarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class CreateThreadRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::allows('update', auth()->user());
     }
 
     /**
@@ -25,9 +25,7 @@ class CreateThreadRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => ['required', 'string', new SpamRule],
-            'body' => ['required', 'string', new SpamRule],
-            'channel_id' => 'required|exists:channels,id'
+            'avatar' => 'required|image|mimes:svg,jpg,jpeg,png|max:50'
         ];
     }
 }

@@ -20,7 +20,7 @@ try {
 window.Vue = require("vue");
 
 Vue.prototype.authorize = function(handler) {
-    let user = window.App && window.App.signedIn;
+    let user = window.App && window.App.user;
     return user ? handler(user) : false;
 };
 
@@ -34,19 +34,18 @@ window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 window.axios.interceptors.response.use(
     response => response,
     error => {
-        if (error.response.data.error.message) {
+        
+        
+        if (error.response.data.error) {
             flash(error.response.data.error.message, "alert-danger");
-        } else if (error.response.data.error.errors) {
-            let allErrors = Object.values(error.response.data.error.errors);
-            allErrors.map(value => {
-                flash(value, "alert-danger");
-            });
+        } else if (error.response.data.errors) {
+            let errorMessages = "";
+            Object.values(error.response.data.errors).map(v => (errorMessages += v + "<br/>"));
+            flash(errorMessages, "alert-danger");
+        } else {
+            flash("Some unexpected error occured!", "alert-warning");
         }
-        // } else if (error.response.data.message) {
-        //     console.log("Ok!");
-        //     flash(error.response.data.error.message);
-        // } else {
-        //     flash("Some error occured!");
-        // }
+
+        return Promise.reject(error);
     }
 );

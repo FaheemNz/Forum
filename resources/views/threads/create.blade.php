@@ -34,6 +34,13 @@
                             <button type="submit" class="btn btn-primary">@lang('messages.words.publish')</button>
                         </div>
                     </form>
+
+                    @if($errors->any())
+                        @foreach($errors->all() as $error)
+                            <li class="text-danger">{{ $error }}</li>
+                        @endforeach
+                    @endif
+
                 </div>
             </div>
         </div>

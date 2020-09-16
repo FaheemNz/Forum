@@ -12,7 +12,8 @@
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between">
                         <span>
-                            <a href="{{ route('profile', $thread->user->name) }}">{{ $thread->user->name }}</a> posted
+                            <img src="{{ $thread->user->avatar_path }}" class="avatar avatar-sm mr-2" />
+                            <a class="is-link" href="{{ route('profile', $thread->user->name) }}">{{ $thread->user->name }}</a> posted
                             {{ $thread->title }}
                         </span>
                         @can('delete', $thread)

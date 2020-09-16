@@ -1,7 +1,6 @@
 <template>
   <aside class="alert shadow" :class="alertTypeClass" role="alert" v-show="show">
-    <div>
-      {{ body }}
+    <div v-html="body">
     </div>
   </aside>
 </template>

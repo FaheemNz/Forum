@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\OnThreadRecievesNewReply;
+use App\Notifications\UserWasMentioned;
 use App\Reply;
 
 class ReplyService
@@ -26,7 +27,7 @@ class ReplyService
             'user_id' => auth()->user()->id
         ]);
 
-        event(new OnThreadRecievesNewReply($reply));
+        event(new OnThreadRecievesNewReply($reply, $replyRequest['body']));
 
         return $reply->load('user:id,name');
     }

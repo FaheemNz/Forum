@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Reply;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Inspections\Spam;
+use App\Rules\SpamRule;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Support\Facades\Gate;
 
 class ReplyRequest extends FormRequest
 {
@@ -14,8 +17,11 @@ class ReplyRequest extends FormRequest
      */
     public function authorize()
     {
-        $this->detectSpam();
-        return true;
+        if ($this->getMethod() === 'POST') {
+            return Gate::allows('create', new Reply);
+        }
+
+        return Gate::allows('update', new Reply);
     }
 
     /**
@@ -26,13 +32,14 @@ class ReplyRequest extends FormRequest
     public function rules()
     {
         return [
-            'body' => 'required',
+            'body' => ['required', 'string', new SpamRule]
         ];
     }
 
-    protected function detectSpam()
+    protected function failedAuthorization()
     {
-        $spam = new Spam();
-        return $spam->detect(request('body'));
+        if ($this->getMethod() === 'POST') {
+            throw new ThrottleRequestsException("You are posting too frequently... Have a break!");
+        }
     }
 }

@@ -72,11 +72,19 @@ class ParticipateInForumTest extends TestCase
 
     public function test_replies_that_contain_spam_are_not_published()
     {
-        $this->withoutExceptionHandling();
         $this->signIn();
         $thread = factory('App\Thread')->create();
-        $reply = factory('App\Reply')->make(['body' => 'Some Spam Here']);
-        $this->expectException('App\Exceptions\SpamException');
-        $this->post("{$thread->path()}/replies", $reply->toArray());
+        $reply = factory('App\Reply')->make(['body' => 'aaaaa']);
+        $this->json('POST', "{$thread->path()}/replies", $reply->toArray())->assertStatus(422);
+    }
+
+    public function test_a_user_may_only_reply_once_in_a_minute()
+    {
+        $this->signIn();
+        $thread = factory('App\Thread')->create();
+        $reply = factory('App\Reply')->make(['body' => 'Hello World']);
+
+        $this->json('POST', $thread->path() . '/replies', $reply->toArray())->assertStatus(201);
+        $this->json('POST', $thread->path() . '/replies', $reply->toArray())->assertStatus(422);
     }
 }

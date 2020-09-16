@@ -7,9 +7,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index');
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::group(['name' => 'thread'], function () {
 
@@ -48,5 +48,9 @@ Route::group(['name' => 'thread'], function () {
     Route::group(['name' => 'thread.subscription'], function () {
         Route::post('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@store');
         Route::delete('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@destroy');
+    });
+
+    Route::group(['name' => 'thread.api', 'middleware' => ['auth']], function () {
+        Route::post('/api/users/{user}/avatar', 'Api\AvatarController@store')->name('store_avatar');
     });
 });

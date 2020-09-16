@@ -9,13 +9,15 @@
     </div>
     <div class="card-body">
       <div v-if="editing" class="form-group text-right">
-        <textarea name id class="form-control" v-model="body" rows="6"></textarea>
-        <div class="mt-3">
-          <button type="button" class="btn" @click="editing = false">Cancel</button>
-          <button type="button" class="btn btn-primary" @click="update">Update</button>
-        </div>
+        <form @submit.prevent="update">
+          <textarea name id class="form-control" required v-model.trim="body" rows="6"></textarea>
+          <div class="mt-3">
+            <button type="button" class="btn" @click="editing = false">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
       </div>
-      <div v-else v-text="body"></div>
+      <div v-else v-html="body"></div>
     </div>
     <div v-if="canUpdate" class="card-footer justify-content-end d-flex align-items-center">
       <button @click="editing = !editing" type="button" class="btn is-sm btn-floating bg-info ml-1">
@@ -49,34 +51,38 @@ export default {
       return !window.App ? false : window.App.signedIn;
     },
 
-    authUserID() {
-      return window.App && window.App.user.id;
-    },
-
     canUpdate() {
-      return this.authorize(() => this.data.user_id == this.authUserID);
+      return this.authorize((user) => user.id == this.data.user_id);
     },
   },
 
   methods: {
     update() {
-      if (!this.body.trim()) return;
+      if (!this.body) return;
 
       axios
         .put("/replies/" + this.data.id, {
           body: this.body,
         })
-        .then((response) => response.status === 204 && flash("Reply updated!"));
+        .then(
+          (response) =>
+            response.status === 204 &&
+            this.updateUI("Reply has been updated!", "alert-info")
+        );
 
       this.editing = false;
     },
 
     deleteReply() {
-      axios
-        .delete("/replies/" + this.data.id)
-        .then((response) => {
-          this.$emit("deletereply", this.id);
-        });
+      axios.delete("/replies/" + this.data.id).then((response) => {
+        if (response.status === 204) {
+          this.updateUI("Reply has been deleted", "alert-info");
+        }
+      });
+    },
+
+    updateUI(message, type) {
+      flash(message, type);
     },
   },
 };
