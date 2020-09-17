@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<a data-toggle="tooltip" data-placement="top" title="Create new Thread" href="{{ route('create_thread') }}" class="btn btn-floating is-fixed">+</a>
 
 <div class="container">
     <div class="main-body">
@@ -59,5 +58,11 @@
         </div>
     </div>
 </div>
+
+@auth
+<a data-toggle="tooltip" data-placement="top" title="Create new Thread" href="{{ route('create_thread') }}" class="btn btn-floating is-fixed">
+    <i class="fa fa-plus"></i>
+</a>
+@endauth
 
 @endsection('content')

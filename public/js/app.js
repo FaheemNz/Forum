@@ -2472,30 +2472,32 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     update: function update() {
+      var _this2 = this;
+
       if (!this.body) return;
       axios.put("/replies/".concat(this.id), {
         body: this.body
       }).then(function (response) {
-        response.status === 204 && this.updateUI("Reply has been updated!", "alert-info");
+        response.status === 204 && _this2.updateUI("Reply has been updated!", "alert-info");
       });
       this.editing = false;
     },
     deleteReply: function deleteReply() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios["delete"]("/replies/".concat(this.id)).then(function (response) {
         if (response.status === 204) {
-          _this2.$emit("ondeletereply", _this2.id);
+          _this3.$emit("ondeletereply", _this3.id);
 
-          _this2.updateUI("Reply has been deleted", "alert-info");
+          _this3.updateUI("Reply has been deleted", "alert-info");
         }
       });
     },
     setReplyAsBest: function setReplyAsBest() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios.post("/replies/".concat(this.id, "/best")).then(function (response) {
-        response.status === 204 && window.events.$emit("onbestreplyselected", _this3.id);
+        response.status === 204 && window.events.$emit("onbestreplyselected", _this4.id);
       });
     },
     updateUI: function updateUI(message, type) {
@@ -2630,6 +2632,12 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Replies_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/Replies.vue */ "./resources/js/components/Replies.vue");
 /* harmony import */ var _components_SubscribeButton_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/SubscribeButton.vue */ "./resources/js/components/SubscribeButton.vue");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2641,7 +2649,14 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       repliesCount: this.thread.replies_count,
-      isLocked: this.thread.is_locked
+      isLocked: this.thread.is_locked,
+      editing: false,
+      title: this.thread.title,
+      body: this.thread.body,
+      form: {
+        title: this.thread.title,
+        body: this.thread.body
+      }
     };
   },
   computed: {
@@ -2656,12 +2671,32 @@ __webpack_require__.r(__webpack_exports__);
       axios.put("/threads/".concat(this.thread.slug, "/lock"), {
         is_locked: !this.isLocked
       }).then(function (response) {
-        response.status === 204 && _this.updateUI();
+        if (response.status === 204) {
+          _this.isLocked = !_this.isLocked;
+
+          _this.updateUI("Thread has been ".concat(_this.isLocked ? "locked." : "unlocked."), "alert-info");
+        }
       });
     },
-    updateUI: function updateUI() {
-      this.isLocked = !this.isLocked;
-      flash("Thread has been ".concat(this.isLocked ? "locked." : "unlocked."), "alert-info");
+    updateThread: function updateThread() {
+      var _this2 = this;
+
+      var params = _objectSpread(_objectSpread({}, this.form), {}, {
+        channel_id: this.thread.channel_id
+      });
+
+      axios.put("/threads/".concat(this.thread.channel.slug, "/").concat(this.thread.slug), params).then(function (response) {
+        return response.status === 204 && _this2.onThreadUpdateComplete();
+      });
+    },
+    onThreadUpdateComplete: function onThreadUpdateComplete() {
+      this.editing = false;
+      this.title = this.form.title;
+      this.body = this.form.body;
+      this.updateUI("Thread has been Updated!", "alert-success");
+    },
+    updateUI: function updateUI(message, type) {
+      flash(message, type);
     }
   }
 });

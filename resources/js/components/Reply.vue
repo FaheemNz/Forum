@@ -95,7 +95,7 @@ export default {
         .put(`/replies/${this.id}`, {
           body: this.body,
         })
-        .then(function (response) {
+        .then((response) => {
           response.status === 204 &&
             this.updateUI("Reply has been updated!", "alert-info");
         });
