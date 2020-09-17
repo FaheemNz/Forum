@@ -78,7 +78,7 @@
                                 {{ auth()->user()->name }}
                             </a>
 
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu custom-menu shadow dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a href="{{ route('profile', Auth::user()) }}" class="dropdown-item">Profile</a>
 
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
@@ -114,6 +114,7 @@
     </script>
     @endauth
     <script src="{{ asset('js/app.js') }}" async defer></script>
+    @yield('scripts')
 </body>
 
 </html>

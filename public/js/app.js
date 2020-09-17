@@ -2331,6 +2331,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -2442,8 +2444,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -2473,7 +2473,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     update: function update() {
       if (!this.body) return;
-      axios.put("/replies/".concat(this.reply.id), {
+      axios.put("/replies/".concat(this.id), {
         body: this.body
       }).then(function (response) {
         response.status === 204 && this.updateUI("Reply has been updated!", "alert-info");
@@ -2483,8 +2483,12 @@ __webpack_require__.r(__webpack_exports__);
     deleteReply: function deleteReply() {
       var _this2 = this;
 
-      axios["delete"]("/replies/".concat(this.reply.id)).then(function (response) {
-        response.status === 204 && _this2.updateUI("Reply has been deleted", "alert-info");
+      axios["delete"]("/replies/".concat(this.id)).then(function (response) {
+        if (response.status === 204) {
+          _this2.$emit("ondeletereply", _this2.id);
+
+          _this2.updateUI("Reply has been deleted", "alert-info");
+        }
       });
     },
     setReplyAsBest: function setReplyAsBest() {
@@ -2633,11 +2637,35 @@ __webpack_require__.r(__webpack_exports__);
     Replies: _components_Replies_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     SubscribeButton: _components_SubscribeButton_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
-  props: ["initialRepliesCount"],
+  props: ["thread"],
   data: function data() {
     return {
-      repliesCount: this.initialRepliesCount
+      repliesCount: this.thread.replies_count,
+      isLocked: this.thread.is_locked
     };
+  },
+  computed: {
+    lockBtnText: function lockBtnText() {
+      return this.isLocked ? "UnLock" : "Lock";
+    }
+  },
+  created: function created() {
+    console.log(this.isLocked);
+  },
+  methods: {
+    toggleThreadLock: function toggleThreadLock() {
+      var _this = this;
+
+      axios.put("/threads/".concat(this.thread.slug, "/lock"), {
+        is_locked: !this.isLocked
+      }).then(function (response) {
+        response.status === 204 && _this.updateUI();
+      });
+    },
+    updateUI: function updateUI() {
+      this.isLocked = !this.isLocked;
+      flash("Thread has been ".concat(this.isLocked ? "locked." : "unlocked."), "alert-info");
+    }
   }
 });
 
@@ -21956,7 +21984,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "mt-4 mb-4" }, [
+  return _c("div", { staticClass: "mt-5 mb-4" }, [
     _vm.signedIn
       ? _c(
           "form",
@@ -22161,6 +22189,8 @@ var render = function() {
   return _c(
     "div",
     [
+      _c("h5", { staticClass: "mt-5" }, [_vm._v("Replies")]),
+      _vm._v(" "),
       _vm._l(_vm.items, function(reply, index) {
         return _c(
           "div",
@@ -22169,7 +22199,7 @@ var render = function() {
             _c("reply", {
               attrs: { reply: reply },
               on: {
-                deletereply: function($event) {
+                ondeletereply: function($event) {
                   return _vm.remove(index)
                 }
               }
@@ -22184,7 +22214,12 @@ var render = function() {
         on: { changed: _vm.fetchReplies }
       }),
       _vm._v(" "),
-      _c("new-reply", { on: { onnewreplycreated: _vm.add } })
+      !_vm.$parent.isLocked
+        ? _c("new-reply", { on: { onnewreplycreated: _vm.add } })
+        : _c("h5", { staticClass: "text-center mt-5" }, [
+            _c("i", { staticClass: "fa fa-lock mr-2" }),
+            _vm._v("Thread has been locked!")
+          ])
     ],
     2
   )
@@ -22321,7 +22356,7 @@ var render = function() {
             "card-footer justify-content-between d-flex align-items-center"
         },
         [
-          _vm.authorize("updateReply", _vm.reply)
+          _vm.authorize("can", _vm.reply)
             ? _c("div", [
                 _c(
                   "button",
@@ -22353,30 +22388,10 @@ var render = function() {
               ])
             : _vm._e(),
           _vm._v(" "),
-          _c(
-            "div",
-            {
-              directives: [
-                {
-                  name: "show",
-                  rawName: "v-show",
-                  value: !_vm.isBestReply,
-                  expression: "!isBestReply"
-                }
-              ]
-            },
-            [
-              _c(
+          _vm.authorize("can", _vm.reply.thread)
+            ? _c(
                 "button",
                 {
-                  directives: [
-                    {
-                      name: "show",
-                      rawName: "v-show",
-                      value: _vm.authorize("updateReply", _vm.reply),
-                      expression: "authorize('updateReply', reply)"
-                    }
-                  ],
                   staticClass: "btn is-sm btn-floating bg-success ml-1",
                   attrs: {
                     "data-toggle": "tooltip",
@@ -22387,8 +22402,7 @@ var render = function() {
                 },
                 [_c("i", { staticClass: "fa fa-check" })]
               )
-            ]
-          )
+            : _vm._e()
         ]
       )
     ]
@@ -34667,12 +34681,12 @@ var app = new Vue({
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/getLoggedInUser.js */ "./resources/js/utils/getLoggedInUser.js");
+/* harmony import */ var _utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/getLoggedInUser.js */ "./resources/js/utils/getLoggedInUser.js");
 
-var user = Object(_utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_1__["getLoggedInUser"])();
+var user = Object(_utils_getLoggedInUser_js__WEBPACK_IMPORTED_MODULE_0__["getLoggedInUser"])();
 var authorizations = {
-  updateReply: function updateReply(reply) {
-    return reply.user_id === user.id;
+  can: function can(model) {
+    return model.user_id === user.id;
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (authorizations);

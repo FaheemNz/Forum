@@ -102,15 +102,22 @@ class ThreadTest extends TestCase
         $this->assertNotEquals($threadByUser1->slug, $threadByUser2->slug);
     }
 
-    public function test_an_error_is_thrown_if_the_same_user_creates_two_threads_with_same_title()
+    // public function test_an_error_is_thrown_if_the_same_user_creates_two_threads_with_same_title()
+    // {
+    //     $this->signIn();
+
+    //     $thread1 = factory('App\Thread')->raw(['title' => 'Hello World']);
+    //     $thread2 = factory('App\Thread')->raw(['title' => 'Hello World']);
+
+    //     $this->post('/threads', $thread1)->assertSessionHasNoErrors();
+    //     $this->post('/threads', $thread2);
+    //     $this->get('/threads/create')->assertSee('You already have a thread with the same title.');
+    // }
+    
+    public function test_a_thread_can_be_locked()
     {
-        $this->signIn();
-
-        $thread1 = factory('App\Thread')->raw(['title' => 'Hello World']);
-        $thread2 = factory('App\Thread')->raw(['title' => 'Hello World']);
-
-        $this->post('/threads', $thread1)->assertSessionHasNoErrors();
-        $this->post('/threads', $thread2);
-        $this->get('/threads/create')->assertSee('You already have a thread with the same title.');
+        $this->assertFalse($this->thread->is_locked);
+        $this->thread->lock();
+        $this->assertTrue($this->thread->is_locked);
     }
 }

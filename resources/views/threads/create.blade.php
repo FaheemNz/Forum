@@ -1,15 +1,16 @@
 @extends('layouts.app')
 
+
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            
+
             <div class="card shadow-sm">
                 <div class="card-header">{{ __('messages.words.newThread') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('store_thread') }}">
+                    <form method="POST" action="{{ route('store_thread') }}" id="threadForm">
                         @csrf
                         <div class="form-group">
                             <label for="channel_id">Select a Channel</label>
@@ -32,7 +33,8 @@
                         </div>
 
                         <div class="form-group text-right">
-                            <button type="submit" class="btn btn-primary">@lang('messages.words.publish')</button>
+                            <button data-sitekey="6Ld_Lc0ZAAAAACSdKjA1upl527SEOvP2WKhO8zsu" data-callback="onSubmit" data-action="submit" class="btn btn-primary g-recaptcha">
+                                @lang('messages.words.publish')</button>
                         </div>
                     </form>
 
@@ -47,4 +49,13 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+    function onSubmit() {
+        document.getElementById("threadForm").submit();
+    }
+</script>
 @endsection

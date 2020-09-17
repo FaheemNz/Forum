@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\RecaptchaRule;
 use App\Rules\SpamRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,9 +26,10 @@ class CreateThreadRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => ['required', 'string', new SpamRule],
-            'body' => ['required', 'string', new SpamRule],
-            'channel_id' => 'required|exists:channels,id'
+            'title' => ['required', 'string', new SpamRule()],
+            'body' => ['required', 'string', new SpamRule()],
+            'channel_id' => 'required|exists:channels,id',
+            //'g-recaptcha-response' => ['required', new RecaptchaRule()]
         ];
     }
 }

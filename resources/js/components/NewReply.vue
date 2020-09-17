@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4 mb-4">
+  <div class="mt-5 mb-4">
     <form @submit.prevent="addReply" v-if="signedIn">
       <div class="form-group">
         <textarea

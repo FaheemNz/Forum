@@ -41,6 +41,12 @@ class ThreadController extends Controller
         }
     }
 
+    // public function update($channel, Thread $thread)
+    // {
+    //     $updatedThread = $this->threadService->updateThread($thread);
+    //     return $updatedThread ? response('', 204) : response('You are not allowed to perform this action');
+    // }
+
     public function show($channelId, \App\Thread $thread, RedisTrending $redisTrending)
     {
         $thread = $this->threadService->getThread($thread);

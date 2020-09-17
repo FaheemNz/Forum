@@ -9,9 +9,8 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication, RefreshDatabase;
 
-    public function signIn()
+    public function signIn($attrs = [])
     {
-        return $this->actingAs(factory('App\User')->create());
+        return $this->actingAs(factory('App\User')->create($attrs));
     }
-
 }

@@ -9,7 +9,7 @@ class MentionUsersTest extends TestCase
     public function test_an_authenticated_user_can_mention_other_users_in_a_reply()
     {
         $userA = factory('App\User')->create(['name' => 'UserA']);
-        $this->signIn($userA);
+        $this->signIn();
         $userB = factory('App\User')->create(['name' => 'UserB']);
         $thread = factory('App\Thread')->create();
         $reply = factory('App\Reply')->create(['body' => '@UserB is mentioned']);

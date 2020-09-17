@@ -16,6 +16,7 @@ Route::group(['name' => 'thread'], function () {
     Route::get('threads', 'Thread\ThreadController@index');
     Route::get('threads/create', 'Thread\ThreadController@create')->name('create_thread');
     Route::post('/threads', 'Thread\ThreadController@store')->name('store_thread');
+    //Route::put('/threads/{channel}/{thread}', 'Thread\ThreadController@update')->name('thread.update');
     Route::delete('threads/{channel}/{thread}', 'Thread\ThreadController@destroy')->name('delete_thread');
 
     // Channel Routes
@@ -54,6 +55,11 @@ Route::group(['name' => 'thread'], function () {
     Route::group(['name' => 'thread.subscription'], function () {
         Route::post('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@store');
         Route::delete('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@destroy');
+    });
+
+    // Admin Thread Locking
+    Route::group(['name' => 'thread.admin.lock', 'middleware' => ['isAdmin']], function () {
+        Route::put('/threads/{thread}/lock', 'Thread\LockThreadController@update')->name('thread.lock');
     });
 
     // Avatar

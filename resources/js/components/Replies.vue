@@ -1,12 +1,14 @@
 <template>
   <div>
+    <h5 class="mt-5">Replies</h5>
     <div :key="reply.id" v-for="(reply, index) in items">
-      <reply @deletereply="remove(index)" :reply="reply"></reply>
+      <reply @ondeletereply="remove(index)" :reply="reply"></reply>
     </div>
 
     <paginator @changed="fetchReplies" :dataSet="dataSet"></paginator>
 
-    <new-reply @onnewreplycreated="add"></new-reply>
+    <new-reply v-if="!$parent.isLocked" @onnewreplycreated="add"></new-reply>
+    <h5 v-else class="text-center mt-5"><i class="fa fa-lock mr-2"></i>Thread has been locked!</h5>
   </div>
 </template>
 

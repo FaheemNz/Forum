@@ -29,7 +29,6 @@ class TrendingThreadsTest extends TestCase
 
     public function test_it_doesnt_adds_duplicate_thread_score_every_time_it_is_read()
     {
-        var_dump('Detect duplicate views!!');
     }
 
     public function test_when_a_thread_is_deleted_its_value_from_redis_set_is_also_deleted()

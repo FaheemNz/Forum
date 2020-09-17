@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\OnThreadRecievesNewReply;
+use App\Exceptions\ThreadIsLockedException;
 use App\Reply;
 
 class ReplyService
@@ -23,6 +24,10 @@ class ReplyService
      */
     public function addReplyToThread($replyRequest, $channelId, \App\Thread $thread): Reply
     {
+        if ($thread->is_locked) {
+            throw new ThreadIsLockedException('Thread has been locked by the admin!');
+        }
+
         $reply = $thread->replies()->create([
             'body' => $replyRequest['body'],
             'user_id' => auth()->user()->id

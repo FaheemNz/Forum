@@ -24,7 +24,7 @@
     </div>
 
     <div class="card-footer justify-content-between d-flex align-items-center">
-      <div v-if="authorize('updateReply', reply)">
+      <div v-if="authorize('can', reply)">
         <button
           @click="editing = !editing"
           type="button"
@@ -44,18 +44,16 @@
         </button>
       </div>
 
-      <div v-show="!isBestReply">
-        <button
-          data-toggle="tooltip"
-          title="Mark Reply as Best"
-          @click="setReplyAsBest"
-          type="button"
-          v-show="authorize('updateReply', reply)"
-          class="btn is-sm btn-floating bg-success ml-1"
-        >
-          <i class="fa fa-check"></i>
-        </button>
-      </div>
+      <button
+        data-toggle="tooltip"
+        title="Mark Reply as Best"
+        @click="setReplyAsBest"
+        type="button"
+        v-if="authorize('can', reply.thread)"
+        class="btn is-sm btn-floating bg-success ml-1"
+      >
+        <i class="fa fa-check"></i>
+      </button>
     </div>
   </div>
 </template>
@@ -94,7 +92,7 @@ export default {
       if (!this.body) return;
 
       axios
-        .put(`/replies/${this.reply.id}`, {
+        .put(`/replies/${this.id}`, {
           body: this.body,
         })
         .then(function (response) {
@@ -106,9 +104,11 @@ export default {
     },
 
     deleteReply() {
-      axios.delete(`/replies/${this.reply.id}`).then((response) => {
-        response.status === 204 &&
+      axios.delete(`/replies/${this.id}`).then((response) => {
+        if (response.status === 204) {
+          this.$emit("ondeletereply", this.id);
           this.updateUI("Reply has been deleted", "alert-info");
+        }
       });
     },
 

@@ -56,7 +56,7 @@ class Handler extends ExceptionHandler
             return $this->respondWithError($exception);
         } else if ($exception instanceof ValidationException && $request->expectsJson()) {
             return $this->respondWithError($exception);
-        } else if ($exception instanceof ThrottleRequestsException) {
+        } else if ($exception instanceof ThrottleRequestsException || $exception instanceof ThreadIsLockedException) {
             return $this->respondWithError($exception);
         }
 

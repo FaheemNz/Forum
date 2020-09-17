@@ -39,7 +39,7 @@ class ThreadService
         );
     }
 
-    public function deleteThread($thread)
+    public function deleteThread(Thread $thread)
     {
         // Replies associated with the thread will also be deleted via onDelete Cascade constraint
         return $thread->delete();

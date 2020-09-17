@@ -21,6 +21,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // Logic
+    public function isAdmin()
+    {
+        return $this->role == 1;
+    }
+    
     // Accessors
     public function getAvatarPathAttribute($value): string
     {

@@ -25,17 +25,14 @@ class ReplyController extends Controller
 
     public function store(ReplyRequest $replyRequest, $channelId, Thread $thread)
     {
-        $newReply = $this->replyService->addReplyToThread(
-            $replyRequest->validated(),
-            $channelId,
-            $thread
-        );
-
-        return $newReply
-            ? $newReply
-            : response()->json(['message' => 'Some error occured while adding reply'], 422);
+        $newReply = $this->replyService->addReplyToThread($replyRequest->validated(), $channelId, $thread);
+        return $newReply ?? response()->json(['message' => 'Some error occured while adding the reply.'], 422);
     }
 
+    /**
+     * Deletes a Reply.
+     * Also deletes the best_reply_id on Thread via Sql Constraints
+     */
     public function destroy(Reply $reply)
     {
         $this->authorize('update', $reply);

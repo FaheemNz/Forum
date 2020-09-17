@@ -17,7 +17,7 @@ class Thread extends Model
     protected $with = ['user:id,name,avatar_path', 'channel:id,name,slug'];
 
     protected static $defaultCols = ['id', 'title', 'body', 'user_id', 'channel_id', 'created_at', 'slug', 'replies_count'];
-    
+
     // Boot the Model
     public static function boot()
     {
@@ -48,6 +48,11 @@ class Thread extends Model
         $this->update(['best_reply_id' => $replyId]);
     }
 
+    public function lock()
+    {
+        $this->update(['is_locked' => true]);
+    }
+    
     // For Testing
     public function addReply($reply)
     {
@@ -131,7 +136,7 @@ class Thread extends Model
     {
         $this->attributes['slug'] = \Illuminate\Support\Str::slug($title) . '-' . $this->user->id;
     }
-    
+
     /*
     *   Core
     * 

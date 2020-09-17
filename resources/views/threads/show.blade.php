@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<thread-view :initial-replies-count="{{ $thread->replies_count }}" inline-template>
+<thread-view :thread="{{ $thread }}" inline-template>
     <div class="container">
         <button data-toggle="tooltip" title="Scroll to top" class="btn btn-floating is-fixed scroll-top">
             <i class="fa fa-long-arrow-up"></i>
@@ -9,7 +9,7 @@
         <div class="row mt-4">
             <div class="col-md-8">
 
-                <div class="card mb-4">
+                <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <span>
                             <img src="{{ $thread->user->avatar_path }}" class="avatar avatar-sm mr-2" />
@@ -32,7 +32,6 @@
                     </div>
                 </div>
 
-                <h6>Replies</h6>
                 <replies @added="repliesCount--" @removed="repliesCount++"></replies>
             </div>
             <div class="col-md-4">
@@ -45,6 +44,9 @@
                         @auth
                         <p>
                             <subscribe-button :active="{{ json_encode($thread->isSubscribedTo) }}"></subscribe-button>
+                            @if( auth()->user()->isAdmin() )
+                            <button @click="toggleThreadLock" type="button" class="btn" v-text="lockBtnText"></button>
+                            @endif
                         </p>
                         @endauth
                     </div>
