@@ -2649,9 +2649,6 @@ __webpack_require__.r(__webpack_exports__);
       return this.isLocked ? "UnLock" : "Lock";
     }
   },
-  created: function created() {
-    console.log(this.isLocked);
-  },
   methods: {
     toggleThreadLock: function toggleThreadLock() {
       var _this = this;

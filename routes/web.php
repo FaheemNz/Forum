@@ -12,11 +12,16 @@ Route::get('/home', 'HomeController@index');
 Auth::routes(['verify' => true]);
 
 Route::group(['name' => 'thread'], function () {
-
+    
+    // Admin Thread Locking (Move upward to remove collision with thread update route)
+    Route::group(['name' => 'thread.admin.lock', 'middleware' => ['isAdmin']], function () {
+        Route::put('/threads/{thread}/lock', 'Thread\LockThreadController@update')->name('thread.lock');
+    });
+    
     Route::get('threads', 'Thread\ThreadController@index');
     Route::get('threads/create', 'Thread\ThreadController@create')->name('create_thread');
     Route::post('/threads', 'Thread\ThreadController@store')->name('store_thread');
-    //Route::put('/threads/{channel}/{thread}', 'Thread\ThreadController@update')->name('thread.update');
+    Route::put('/threads/{channel}/{thread}', 'Thread\ThreadController@update')->name('threads.update');
     Route::delete('threads/{channel}/{thread}', 'Thread\ThreadController@destroy')->name('delete_thread');
 
     // Channel Routes
@@ -57,13 +62,9 @@ Route::group(['name' => 'thread'], function () {
         Route::delete('/threads/{channel}/{thread}/subscriptions', 'Thread\ThreadSubscriptionController@destroy');
     });
 
-    // Admin Thread Locking
-    Route::group(['name' => 'thread.admin.lock', 'middleware' => ['isAdmin']], function () {
-        Route::put('/threads/{thread}/lock', 'Thread\LockThreadController@update')->name('thread.lock');
-    });
-
     // Avatar
     Route::group(['name' => 'thread.api', 'middleware' => ['auth']], function () {
         Route::post('/api/users/{user}/avatar', 'Api\AvatarController@store')->name('store_avatar');
     });
+    
 });

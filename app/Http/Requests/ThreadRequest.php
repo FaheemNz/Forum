@@ -6,7 +6,7 @@ use App\Rules\RecaptchaRule;
 use App\Rules\SpamRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateThreadRequest extends FormRequest
+class ThreadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,6 +15,10 @@ class CreateThreadRequest extends FormRequest
      */
     public function authorize()
     {
+        if ($this->getMethod() === 'PUT') {
+            return $this->user()->can('update', $this->route('thread'));
+        }
+
         return true;
     }
 

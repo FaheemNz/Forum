@@ -38,6 +38,11 @@ class ThreadService
             ]
         );
     }
+    
+    public function updateThread(Thread $thread, $threadRequest): bool
+    {
+        return $thread->update($threadRequest);
+    }
 
     public function deleteThread(Thread $thread)
     {

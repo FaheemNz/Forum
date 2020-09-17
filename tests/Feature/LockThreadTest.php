@@ -28,10 +28,10 @@ class LockThreadTest extends TestCase
 
         $this->put(route('thread.lock', $thread->slug), [
             'is_locked' => true
-        ])->assertStatus(204);
+        ]);
         
         $this->assertTrue(!!$thread->fresh()->is_locked);
-       
+        
         $this->put(route('thread.lock', $thread->slug), [
             'is_locked' => false
         ])->assertStatus(204);

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Thread;
 
 use App\Filters\ThreadFilters;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateThreadRequest;
+use App\Http\Requests\ThreadRequest;
 use App\Services\ThreadService;
 use App\Utils\RedisTrending;
 
@@ -31,21 +31,21 @@ class ThreadController extends Controller
         return view('threads.create');
     }
 
-    public function store(CreateThreadRequest $createThreadRequest)
+    public function store(ThreadRequest $threadRequest)
     {
         try {
-            $newThread = $this->threadService->createThread($createThreadRequest->validated());
+            $newThread = $this->threadService->createThread($threadRequest->validated());
             return redirect($newThread->path())->with('flash', 'New thread has been created.');
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect()->back()->withErrors('You already have a thread with the same title.');
         }
     }
 
-    // public function update($channel, Thread $thread)
-    // {
-    //     $updatedThread = $this->threadService->updateThread($thread);
-    //     return $updatedThread ? response('', 204) : response('You are not allowed to perform this action');
-    // }
+    public function update($channel, \App\Thread $thread, ThreadRequest $threadRequest)
+    {
+        $updatedThread = $this->threadService->updateThread($thread, $threadRequest->validated());
+        return $updatedThread ? response('', 204) : response('Thread cant be updated!');
+    }
 
     public function show($channelId, \App\Thread $thread, RedisTrending $redisTrending)
     {

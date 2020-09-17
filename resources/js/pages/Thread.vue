@@ -20,10 +20,6 @@ export default {
     },
   },
   
-  created(){
-    console.log(this.isLocked)
-  },
-
   methods: {
     toggleThreadLock() {
       axios
