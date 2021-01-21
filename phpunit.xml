@@ -28,5 +28,6 @@
         <server name="SESSION_DRIVER" value="array"/>
         <server name="TELESCOPE_ENABLED" value="false"/>
         <server name="REDIS_CLIENT" value="mock" />
+        <server name="SCOUT_DRIVER" value="null" />
     </php>
 </phpunit>

@@ -28,6 +28,18 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-4">
+            <div class="col">
+                <ais-instant-search :search-client="searchClient" index-name="threads">
+                    <ais-search-box></ais-search-box>
+                    <ais-hits>
+                        <div slot="item" slot-scope="{ item }">
+                            <h2>@{{ item.title }}</h2>
+                        </div>
+                    </ais-hits>
+                </ais-instant-search>
+            </div>
+        </div>
     </div>
 </thread-view>
 

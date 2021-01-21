@@ -27,11 +27,10 @@ class ThreadService
 
     public function createThread($createThreadRequest): Thread
     {
-        $title = $createThreadRequest['title'];
         return Thread::create(
             [
                 'user_id' => auth()->user()->id,
-                'title' => $title,
+                'title' => $createThreadRequest['title'],
                 'body' => $createThreadRequest['body'],
                 'channel_id' => $createThreadRequest['channel_id'],
                 'slug' => $createThreadRequest['title']

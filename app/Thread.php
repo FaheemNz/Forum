@@ -6,10 +6,11 @@ use App\Events\OnThreadRecievesNewReply;
 use App\Filters\ThreadFilters;
 use App\Traits\RecordsActivity;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Thread extends Model
 {
-    use RecordsActivity;
+    use RecordsActivity, Searchable;
 
     protected $guarded = [];
     protected $perPage = 25;
@@ -144,5 +145,10 @@ class Thread extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+    
+    public function toArray()
+    {
+        return $this->toArray() + ['path' => $this->path()];
     }
 }

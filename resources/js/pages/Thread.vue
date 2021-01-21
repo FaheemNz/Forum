@@ -1,6 +1,8 @@
 <script>
 import Replies from "../components/Replies.vue";
 import SubscribeButton from "../components/SubscribeButton.vue";
+import InstantSearch from "vue-instantsearch";
+import algoliasearch from "algoliasearch/lite";
 
 export default {
   components: { Replies, SubscribeButton },
@@ -18,6 +20,7 @@ export default {
         title: this.thread.title,
         body: this.thread.body,
       },
+      searchClient: algoliasearch("QHOKJHIW7F", "5e175c31a4268634510578886f0ae499")
     };
   },
 

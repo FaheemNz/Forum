@@ -18,6 +18,10 @@ Route::group(['name' => 'thread'], function () {
         Route::put('/threads/{thread}/lock', 'Thread\LockThreadController@update')->name('thread.lock');
     });
     
+    Route::group(['name' => 'thread.search'], function(){
+        Route::get('/threads/search', 'SearchController@index');
+    });
+    
     Route::get('threads', 'Thread\ThreadController@index');
     Route::get('threads/create', 'Thread\ThreadController@create')->name('create_thread');
     Route::post('/threads', 'Thread\ThreadController@store')->name('store_thread');

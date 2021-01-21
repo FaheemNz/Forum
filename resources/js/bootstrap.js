@@ -1,23 +1,19 @@
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
-
-try {
-    window.Popper = require("popper.js").default;
-    window.$ = window.jQuery = require("jquery");
-
-    require("bootstrap");
-} catch (e) {}
-
-window.Vue = require("vue");
-
-import authorizations from "./authorizations.js";
+import Vue from "vue";
+import Popper from "popper.js";
+import JQuery from "jquery";
+import bootstrap from "bootstrap";
 import axios from "./bootAxios.js";
-import { getLoggedInUser } from "./utils/getLoggedInUser.js";
 
+window.Popper = Popper;
+window.$ = JQuery;
+window.Vue = Vue;
 window.axios = axios;
+
+import { getLoggedInUser } from "./utils/getLoggedInUser.js";
+import authorizations from "./authorizations.js";
+import InstantSearch from "vue-instantsearch";
+
+Vue.use(InstantSearch);
 
 Vue.prototype.authorize = function(...params) {
     let user = getLoggedInUser();
