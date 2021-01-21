@@ -29,9 +29,13 @@ class ThreadTest extends TestCase
     public function test_a_thread_can_add_a_reply()
     {
         $this->signIn();
-        $this->post($this->thread->path() . '/replies', [
+        
+        $response = $this->post($this->thread->path() . '/replies', [
             'body' => 'Hello World this is a reply!'
         ]);
+        
+        dd( $response->decodeResponseJson() );
+        
         $this->assertCount(1, $this->thread->replies);
     }
 

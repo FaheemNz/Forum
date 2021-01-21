@@ -6,11 +6,10 @@ use App\Events\OnThreadRecievesNewReply;
 use App\Filters\ThreadFilters;
 use App\Traits\RecordsActivity;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 
 class Thread extends Model
 {
-    use RecordsActivity, Searchable;
+    use RecordsActivity;
 
     protected $guarded = [];
     protected $perPage = 25;
@@ -63,7 +62,7 @@ class Thread extends Model
     }
 
     // Helpers
-    public function path(): string
+    public function path()
     {
         return "/threads/{$this->channel->slug}/{$this->slug}";
     }
@@ -142,7 +141,7 @@ class Thread extends Model
     *   Core
     * 
     */
-    public function getRouteKeyName(): string
+    public function getRouteKeyName()
     {
         return 'slug';
     }

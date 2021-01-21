@@ -10,7 +10,7 @@ class UpdateThreadTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $this->signIn();
-
+        
         $thread = factory('App\Thread')->create(['user_id' => auth()->id()]);
         $newData = ['title' => 'New Title', 'body' => 'New Body', 'channel_id' => 1];
         $this->put($thread->path(), $newData)->assertStatus(204);

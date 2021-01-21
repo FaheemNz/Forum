@@ -50,7 +50,6 @@ class Reply extends Model
     {
         return $this->belongsTo('App\Thread');
     }
-
     public function user()
     {
         return $this->belongsTo('App\User');
