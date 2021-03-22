@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 Route::get('/home', 'HomeController@index');
 
-Auth::routes(['verify' => true]);
+Auth::routes();
 
 Route::group(['name' => 'thread'], function () {
     

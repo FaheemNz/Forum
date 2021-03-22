@@ -26,9 +26,15 @@ class CreateThreadsTest extends TestCase
         $this->signIn();
 
         $thread = factory('App\Thread')->make();
-
-        $response = $this->post('/threads', $thread->toArray());
-
+        
+        //$response = $this->post('/threads', $thread->toArray());
+        
+        $response = $this->post('/threads', [
+            'title' => 'Title',
+            'body' => 'Body',
+            'channel_id' => 1,
+        ]);
+        
         // if we just do $threads->path(), we don't get the primary key as we are calling make instead of create
         $this->get($response->headers->get('Location'))
             ->assertSee($thread->title)
